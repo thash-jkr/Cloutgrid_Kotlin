@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class HomeManager @Inject constructor(
-    private val authRepository: AuthRepository,
+    authRepository: AuthRepository,
     private val homeRepository: HomeRepository,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {

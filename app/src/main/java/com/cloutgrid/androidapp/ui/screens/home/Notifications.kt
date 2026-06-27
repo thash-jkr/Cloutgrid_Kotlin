@@ -62,7 +62,6 @@ fun Notifications(
                         items = home.notifications,
                         key = { _, item -> item.id }
                     ) { index, item ->
-
                         val cardShape = when {
                             home.notifications.size == 1 -> RoundedCornerShape(20.dp)
                             index == 0 -> RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)

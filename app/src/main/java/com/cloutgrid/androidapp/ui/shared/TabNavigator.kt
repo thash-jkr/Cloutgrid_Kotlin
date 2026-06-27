@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.cloutgrid.androidapp.ui.screens.home.HomeScreen
 import com.cloutgrid.androidapp.ui.screens.profile.ProfileScreen
@@ -119,7 +120,9 @@ fun TabNavigator(onNavigateToChatScreen: () -> Unit) {
                 TabItem.Search -> Box(Modifier.fillMaxSize().padding(paddingValues)) { SearchScreen() }
                 TabItem.Create -> Box(Modifier.fillMaxSize().padding(paddingValues)) { CreateScreen() }
                 TabItem.Jobs -> Box(Modifier.fillMaxSize().padding(paddingValues)) { JobsScreen() }
-                TabItem.Profile -> Box(Modifier.fillMaxSize().padding(paddingValues)) { ProfileScreen() }
+                TabItem.Profile -> ProfileScreen(
+                    scaffoldPadding = paddingValues
+                )
             }
         }
     }

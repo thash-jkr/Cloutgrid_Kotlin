@@ -1,6 +1,7 @@
 package com.cloutgrid.androidapp.ui.screens.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -39,6 +40,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -144,9 +146,20 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.width(15.dp))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    // 🌟 2. Make the native toolbar overlay completely clear
                     containerColor = Color.Transparent,
                     scrolledContainerColor = Color.Transparent
+                ),
+                modifier = Modifier.background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.White.copy(alpha = 1f),
+                            Color.White.copy(alpha = 0.8f),
+                            Color.White.copy(alpha = 0.6f),
+                            Color.White.copy(alpha = 0.4f),
+                            Color.White.copy(alpha = 0.2f),
+                            Color.White.copy(alpha = 0.0f)
+                        )
+                    )
                 )
             )
         }
