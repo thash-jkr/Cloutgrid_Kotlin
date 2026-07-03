@@ -8,21 +8,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cloutgrid.androidapp.data.model.CommentModel
 import com.cloutgrid.androidapp.data.model.PostModel
 import com.cloutgrid.androidapp.data.repository.ProfileRepository
 import com.cloutgrid.androidapp.data.model.UserContainer
 import com.cloutgrid.androidapp.data.repository.AuthRepository
+import com.cloutgrid.androidapp.data.repository.HomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileManager @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val authRepository: AuthRepository,
-    @ApplicationContext private val context: Context
+    private val homeRepository: HomeRepository,
+    @ApplicationContext val context: Context
 ) : ViewModel() {
     val user = authRepository.user.stateIn(
         scope = viewModelScope,
@@ -38,6 +42,8 @@ class ProfileManager @Inject constructor(
 
     val otherPosts = mutableStateListOf<PostModel>()
     val otherCollabs = mutableStateListOf<PostModel>()
+
+    val comments = mutableStateListOf<CommentModel>()
 
     var isLoading by mutableStateOf(false)
         private set
@@ -62,6 +68,26 @@ class ProfileManager @Inject constructor(
         }
     }
 
+    fun updateProfile(type: String, data: Map<String, String>, imageBytes: ByteArray?) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = null
+
+            try {
+                authRepository.updateProfile(
+                    type,
+                    data,
+                    imageBytes
+                )
+            } catch (e: Exception) {
+                errorMessage = e.localizedMessage ?: "Failed to update profile"
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
     suspend fun fetchPosts(username: String, other: Boolean = false) {
         isLoading = true
         errorMessage = null
@@ -76,6 +102,89 @@ class ProfileManager @Inject constructor(
         } catch (e: Exception) {
             isLoading = false
             errorMessage = e.localizedMessage ?: "An error occurred"
+        }
+    }
+
+    fun likePost(postID: Int) {
+        viewModelScope.launch {
+            try {
+                val response = homeRepository.likePost(postID)
+
+                val postIndex = posts.indexOfFirst { it.id == postID }
+                if (postIndex != -1) {
+                    posts[postIndex] = posts[postIndex].copy(
+                        likeCount = response.likeCount,
+                        isLiked = response.liked
+                    )
+                }
+
+                val collabIndex = collabs.indexOfFirst { it.id == postID }
+                if (collabIndex != -1) {
+                    collabs[collabIndex] = collabs[collabIndex].copy(
+                        likeCount = response.likeCount,
+                        isLiked = response.liked
+                    )
+                }
+            } catch (e: Exception) {
+                println(e.localizedMessage)
+            }
+        }
+    }
+
+    fun fetchComments(postID: Int) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = null
+            comments.clear()
+
+            try {
+                val results = homeRepository.fetchComments(postID)
+                comments.addAll(results)
+            } catch (e: Exception) {
+                errorMessage = e.localizedMessage
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun addComment(postID: Int, content: String) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = null
+            try {
+                val newComment = homeRepository.addComment(postID, content)
+                comments.add(0, newComment)
+
+                val postIndex = posts.indexOfFirst { it.id == postID }
+                if (postIndex != -1) {
+                    posts[postIndex] = posts[postIndex].copy(commentCount = posts[postIndex].commentCount + 1)
+                }
+            } catch (e: Exception) {
+                errorMessage = e.localizedMessage
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun deleteComment(postID: Int, commentID: Int) {
+        viewModelScope.launch {
+            errorMessage = null
+            try {
+                homeRepository.deleteComment(postID, commentID)
+                comments.removeAll { it.id == commentID }
+
+                val postIndex = posts.indexOfFirst { it.id == postID }
+                if (postIndex != -1) {
+                    posts[postIndex] = posts[postIndex].copy(commentCount = posts[postIndex].commentCount - 1)
+                }
+
+                Toast.makeText(context, "Comment deleted", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                errorMessage = e.localizedMessage
+                Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -103,14 +212,12 @@ class ProfileManager @Inject constructor(
         try {
             profileRepository.handleBlock(username, block)
 
-            // 🌟 Built-in Toast for Success
             Toast.makeText(
                 context,
                 "You have ${if (block) "blocked" else "unblocked"} @$username",
                 Toast.LENGTH_SHORT
             ).show()
 
-            // Update UI state locally inside the Manager
             otherProfile = otherProfile?.copy(isBlocking = block)
             isLoading = false
         } catch (e: Exception) {
@@ -140,6 +247,12 @@ class ProfileManager @Inject constructor(
             }
         } catch (e: Exception) {
             errorMessage = e.localizedMessage ?: "An error occurred"
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            authRepository.logout()
         }
     }
 }

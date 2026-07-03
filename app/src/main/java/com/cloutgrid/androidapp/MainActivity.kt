@@ -20,14 +20,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
-                scrim = 0, // Status bar background color
-                darkScrim = 0 // Status bar background for system dark mode
+                scrim = 0,
+                darkScrim = 0
             )
         )
 
         setContent {
             CloutgridTheme {
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
                     AppCoordinator()
                 }
             }

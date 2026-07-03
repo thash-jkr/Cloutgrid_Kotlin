@@ -53,17 +53,4 @@ class AuthManager @Inject constructor(
             }
         }
     }
-
-    fun logout() {
-        viewModelScope.launch {
-            isLoading = true
-            try {
-                authRepository.logout()
-            } catch (e: Exception) {
-                errorMessage = e.localizedMessage
-            } finally {
-                isLoading = false
-            }
-        }
-    }
 }

@@ -1,32 +1,15 @@
 package com.cloutgrid.androidapp.ui.screens.home
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -39,14 +22,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.cloutgrid.androidapp.R
+import com.cloutgrid.androidapp.data.model.HeaderAction
+import com.cloutgrid.androidapp.ui.components.CloutHeader
+import com.cloutgrid.androidapp.ui.components.CloutSheet
 import com.cloutgrid.androidapp.ui.components.LoadingSpinner
+import com.cloutgrid.androidapp.ui.shared.TabItem
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,10 +39,12 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     home: HomeManager = hiltViewModel(),
     scaffoldPadding: PaddingValues,
-    onNavigateToChatScreen: () -> Unit
+    onNavigateToChatScreen: () -> Unit,
+    onNavigateToOtherProfile: (String) -> Unit,
+    onSelectTab: (TabItem) -> Unit
 ) {
     var showNotificationSheet by remember { mutableStateOf(false) }
-    val notificationSheetState = rememberModalBottomSheetState()
+    val notificationSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var selectedPostId by remember { mutableStateOf<Int?>(null) }
     val commentSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -96,69 +83,27 @@ fun HomeScreen(
 
     val posts = home.posts
     val user by home.user.collectAsState()
+    val appLogoVector = ImageVector.vectorResource(id = R.drawable.cloutgrid_logo)
 
     Scaffold(
         containerColor = Color.Transparent,
         topBar = {
-            TopAppBar(
-                title = {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_app_logo),
-                        contentDescription = "Cloutgrid Logo",
-                        modifier = Modifier
-                            .size(45.dp)
-                            .clip(CircleShape)
-                    )
-                },
-                actions = {
-                    FilledTonalIconButton(
-                        onClick = { showNotificationSheet = true },
-                        modifier = Modifier.size(45.dp),
-                        colors = IconButtonDefaults.filledTonalIconButtonColors(
-                            containerColor = Color.White,
-                            contentColor = MaterialTheme.colorScheme.onSurface
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notifications",
-                            modifier = Modifier.size(25.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(15.dp))
-
-                    FilledTonalIconButton(
-                        onClick = { onNavigateToChatScreen() },
-                        modifier = Modifier.size(45.dp),
-                        colors = IconButtonDefaults.filledTonalIconButtonColors(
-                            containerColor = Color.White,
-                            contentColor = MaterialTheme.colorScheme.onSurface
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.ChatBubbleOutline,
-                            contentDescription = "Direct Messages",
-                            modifier = Modifier.size(25.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(15.dp))
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                    scrolledContainerColor = Color.Transparent
+            CloutHeader(
+                icon = HeaderAction(
+                    icon = appLogoVector,
+                    contentDescription = "Logo",
+                    onClick = {}
                 ),
-                modifier = Modifier.background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.White.copy(alpha = 1f),
-                            Color.White.copy(alpha = 0.8f),
-                            Color.White.copy(alpha = 0.6f),
-                            Color.White.copy(alpha = 0.4f),
-                            Color.White.copy(alpha = 0.2f),
-                            Color.White.copy(alpha = 0.0f)
-                        )
+                actions = listOf(
+                    HeaderAction(
+                        icon = Icons.Default.Notifications,
+                        contentDescription = "Notifications",
+                        onClick = { showNotificationSheet = true }
+                    ),
+                    HeaderAction(
+                        icon = Icons.Outlined.ChatBubbleOutline,
+                        contentDescription = "Direct Messages",
+                        onClick = { onNavigateToChatScreen() }
                     )
                 )
             )
@@ -193,8 +138,21 @@ fun HomeScreen(
                     FeedPost(
                         post = post,
                         onLikeClick = { home.likePost(post.id) },
-                        onCommentClick = { selectedPostId = post.id },
-                        onUserClick = {  }
+                        onCommentClick = {
+                            home.fetchComments(post.id)
+                            selectedPostId = post.id
+                        },
+                        onUserClick = {
+                            username ->
+                            run {
+                                if (username == user?.profile?.username) {
+                                    onSelectTab(TabItem.Profile)
+                                } else {
+                                    onNavigateToOtherProfile(username)
+                                }
+
+                            }
+                        }
                     )
                 }
 
@@ -207,39 +165,25 @@ fun HomeScreen(
         }
 
         if (showNotificationSheet) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    showNotificationSheet = false
-                },
-                sheetState = notificationSheetState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding(),
-                contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
-                dragHandle = null
-            ) {
-                Notifications()
-            }
+            CloutSheet(
+                notificationSheetState,
+                { showNotificationSheet = false },
+                { Notifications() }
+            )
         }
 
         selectedPostId?.let { postId ->
-            ModalBottomSheet(
-                onDismissRequest = {
-                    selectedPostId = null
-                },
-                sheetState = commentSheetState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding(),
-                contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
-                dragHandle = null
-            ) {
-                Comments(
-                    postID = postId,
-                    homeManager = home,
-                    user = user
-                )
-            }
+            CloutSheet(
+                commentSheetState,
+                { selectedPostId = null },
+                { Comments(
+                    comments = home.comments,
+                    isLoading = home.isLoading,
+                    user = user,
+                    onAddComment = { home.addComment(postId, it) },
+                    onDeleteComment = { home.deleteComment(postId, it) }
+                ) }
+            )
         }
     }
 }

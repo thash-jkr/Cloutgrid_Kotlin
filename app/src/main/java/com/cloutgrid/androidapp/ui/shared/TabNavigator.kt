@@ -23,10 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import com.cloutgrid.androidapp.data.model.PostModel
 import com.cloutgrid.androidapp.ui.screens.home.HomeScreen
 import com.cloutgrid.androidapp.ui.screens.profile.ProfileScreen
+import com.cloutgrid.androidapp.ui.theme.First
 import com.cloutgrid.androidapp.ui.theme.Second
 import kotlinx.coroutines.launch
 
@@ -39,10 +40,22 @@ enum class TabItem(val title: String, val icon: ImageVector) {
 }
 
 @Composable
-fun TabNavigator(onNavigateToChatScreen: () -> Unit) {
+fun TabNavigator(
+    onNavigateToChatScreen: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+    onNavigateToEditProfile: () -> Unit,
+    onNavigateToPostDetail: (PostModel, Boolean) -> Unit,
+    onNavigateToOtherProfile: (String) -> Unit,
+) {
     val tabs = TabItem.entries.toTypedArray()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val coroutineScope = rememberCoroutineScope()
+
+    val selectTab: (TabItem) -> Unit = { tab ->
+        coroutineScope.launch {
+            pagerState.animateScrollToPage(tab.ordinal)
+        }
+    }
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -53,8 +66,8 @@ fun TabNavigator(onNavigateToChatScreen: () -> Unit) {
                     .padding(horizontal = 20.dp, vertical = 12.dp)
                     .height(70.dp)
                     .fillMaxWidth(),
-                shape = CircleShape, // Creates a perfect capsule shape
-                color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f),
+                shape = CircleShape,
+                color = Color.White.copy(alpha = 0.92f),
                 tonalElevation = 8.dp
             ) {
                 Row(
@@ -97,8 +110,8 @@ fun TabNavigator(onNavigateToChatScreen: () -> Unit) {
                                         imageVector = tab.icon,
                                         contentDescription = tab.title,
                                         modifier = Modifier.size(25.dp),
-                                        tint = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                                        else MaterialTheme.colorScheme.onSurfaceVariant
+                                        tint = if (isSelected) Color.White
+                                        else First
                                     )
                                 }
                             }
@@ -111,17 +124,24 @@ fun TabNavigator(onNavigateToChatScreen: () -> Unit) {
         HorizontalPager(
             state = pagerState,
             userScrollEnabled = true,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
         ) { pageIndex ->
             when (tabs[pageIndex]) {
                 TabItem.Home -> HomeScreen(
-                    scaffoldPadding = paddingValues, onNavigateToChatScreen = onNavigateToChatScreen
+                    scaffoldPadding = paddingValues,
+                    onSelectTab = selectTab,
+                    onNavigateToChatScreen = onNavigateToChatScreen,
+                    onNavigateToOtherProfile = onNavigateToOtherProfile
                 )
                 TabItem.Search -> Box(Modifier.fillMaxSize().padding(paddingValues)) { SearchScreen() }
                 TabItem.Create -> Box(Modifier.fillMaxSize().padding(paddingValues)) { CreateScreen() }
                 TabItem.Jobs -> Box(Modifier.fillMaxSize().padding(paddingValues)) { JobsScreen() }
                 TabItem.Profile -> ProfileScreen(
-                    scaffoldPadding = paddingValues
+                    scaffoldPadding = paddingValues,
+                    onNavigateToSettings = onNavigateToSettings,
+                    onNavigateToEditProfile = onNavigateToEditProfile,
+                    onNavigateToPostDetail = onNavigateToPostDetail
                 )
             }
         }

@@ -8,25 +8,25 @@ plugins {
 
 android {
     namespace = "com.cloutgrid.androidapp"
-    compileSdk {
-        version = release(37)
-    }
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.cloutgrid.androidapp"
         minSdk = 31
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            optimization {
-                enable = false
-            }
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
@@ -48,7 +48,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.material3)
     implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -59,8 +58,8 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.material.icons.extended)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
-    implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.hilt.navigation.compose)
     implementation(libs.dagger.hilt.android)
     ksp(libs.dagger.hilt.compiler)
     implementation(libs.ktor.client.core)
@@ -71,4 +70,5 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.image.cropper)
 }

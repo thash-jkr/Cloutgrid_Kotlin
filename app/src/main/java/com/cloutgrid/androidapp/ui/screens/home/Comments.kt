@@ -17,147 +17,116 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.cloutgrid.androidapp.data.model.CommentModel
-import kotlinx.coroutines.launch
 import com.cloutgrid.androidapp.data.model.UserContainer
 import com.cloutgrid.androidapp.data.network.ApiConfig
+import com.cloutgrid.androidapp.ui.components.CloutHeader
 import com.cloutgrid.androidapp.ui.components.Empty
+import com.cloutgrid.androidapp.ui.components.ReportBox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Comments(
-    postID: Int,
-    homeManager: HomeManager,
+    comments: List<CommentModel>,
+    isLoading: Boolean,
     user: UserContainer?,
+    onAddComment: (String) -> Unit,
+    onDeleteComment: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     var showReportAlert by remember { mutableStateOf(false) }
     var commentText by remember { mutableStateOf("") }
     var reportContent by remember { mutableStateOf("") }
 
-    LaunchedEffect(postID) {
-        homeManager.fetchComments(postID = postID)
-    }
-
     Scaffold(
-        modifier = modifier.imePadding(),
+        modifier = modifier,
+        containerColor = Color.Transparent,
         topBar = {
-            Column {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            text = "Comments",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
-                )
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-                )
-            }
+            CloutHeader(title = "Comments")
         },
         bottomBar = {
-            Column {
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-                )
-
-                CommentInputBar(
-                    user = user,
-                    commentText = commentText,
-                    onCommentChange = { commentText = it },
-                    onSendClick = {
-                        coroutineScope.launch {
-                            homeManager.addComment(postID = postID, content = commentText)
-                            commentText = ""
-                        }
+            CommentInputBar(
+                user = user,
+                commentText = commentText,
+                onCommentChange = { commentText = it },
+                onSendClick = {
+                    if (commentText.isNotBlank()) {
+                        onAddComment(commentText)
+                        commentText = "" // Safely clears input after sending
                     }
-                )
-            }
+                },
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+            )
         }
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            if (homeManager.comments.isNotEmpty()) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            if (comments.isNotEmpty()) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .background(Color.White)
+                        .fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        start = 0.dp,
+                        top = innerPadding.calculateTopPadding(),
+                        end = 0.dp,
+                        bottom = innerPadding.calculateBottomPadding() + 16.dp
+                    )
                 ) {
                     items(
-                        items = homeManager.comments,
+                        items = comments,
                         key = { it.id }
                     ) { commentItem ->
                         CommentRow(
                             comment = commentItem,
                             user = user,
-                            onDelete = {
-                                coroutineScope.launch {
-                                    homeManager.deleteComment(postID = postID, commentID = commentItem.id)
-                                }
-                            },
-                            onReport = {
-                                showReportAlert = true
-                            }
+                            onDelete = { onDeleteComment(commentItem.id) },
+                            onReport = { showReportAlert = true }
                         )
                     }
                 }
             } else {
-                Empty(type = "comment", message = "No comments yet!", isLoading = homeManager.isLoading)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White)
+                ) {
+                    Empty(
+                        type = "comment",
+                        message = "No comments yet!",
+                        isLoading = isLoading,
+                        modifier = Modifier.padding(top = innerPadding.calculateTopPadding())
+                    )
+                }
             }
         }
     }
 
     if (showReportAlert) {
-        AlertDialog(
-            onDismissRequest = { showReportAlert = false },
-            title = { Text("Report Content") },
-            text = {
-                Column {
-                    Text(
-                        text = "Please tell us why you are reporting this. Our team will review it shortly.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    OutlinedTextField(
-                        value = reportContent,
-                        onValueChange = { reportContent = it },
-                        placeholder = { Text("Reason (e.g., Spam, Harassment)") },
-                        modifier = Modifier.fillMaxWidth(),
-                        maxLines = 3
-                    )
-                }
+        ReportBox(
+            title = "Report Content",
+            body = "Let us know what you think should be reported. Our team will review it shortly",
+            onDismiss = {
+                reportContent = ""
+                showReportAlert = false
             },
-            confirmButton = {
-                TextButton(onClick = { showReportAlert = false }) {
-                    Text("Submit")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        reportContent = ""
-                        showReportAlert = false
-                    }
-                ) {
-                    Text("Cancel")
-                }
+            onSubmit = {
+                reportContent = it
+                showReportAlert = false
             }
         )
     }
 }
 
-// --- Sub-Component: Single Comment List Item Row ---
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CommentRow(
@@ -199,16 +168,13 @@ private fun CommentRow(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface) // 🌟 Shields the red background completely
+                .background(Color.White),
         ) {
-            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    // Removed the background modifier from here since the parent Column handles it now
                     .padding(horizontal = 16.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
                 AsyncImage(
                     model = ApiConfig.current.baseURL + comment.user.profilePhoto,
@@ -220,20 +186,34 @@ private fun CommentRow(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Column(modifier = Modifier.weight(1f)) {
+                Column(
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.Start,
+                ) {
                     Text(
                         text = "${comment.user.name} • ${comment.timeAgo}",
                         fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = TextStyle(
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            )
+                        )
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
+
+                    Spacer(modifier = Modifier.height(1.dp))
+
                     Text(
                         text = comment.content,
                         fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = TextStyle(
+                            lineHeight = 1.2.em
+                        )
                     )
                 }
             }
+            HorizontalDivider(color = Color.Gray.copy(alpha = 0.1f))
         }
     }
 }
@@ -243,72 +223,69 @@ private fun CommentInputBar(
     user: UserContainer?,
     commentText: String,
     onCommentChange: (String) -> Unit,
-    onSendClick: () -> Unit
+    onSendClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Surface(
-        tonalElevation = 2.dp,
-        modifier = Modifier
+    Row(
+        modifier = modifier
             .fillMaxWidth()
+            .shadow(elevation = 6.dp, shape = RoundedCornerShape(28.dp))
+            .background(Color.White, shape = RoundedCornerShape(28.dp))
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
+        AsyncImage(
+            model = ApiConfig.current.baseURL + (user?.profile?.profilePhoto),
+            contentDescription = "My Profile Photo",
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, bottom = 24.dp, start = 16.dp, end = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            AsyncImage(
-                model = ApiConfig.current.baseURL + (user?.profile?.profilePhoto),
-                contentDescription = "My Profile Photo",
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-            )
+                .size(40.dp)
+                .clip(CircleShape)
+        )
 
-            Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(10.dp))
 
-            BasicTextField(
-                value = commentText,
-                onValueChange = onCommentChange,
-                textStyle = TextStyle(fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface),
-                modifier = Modifier
-                    .weight(1f)
-                    .height(40.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f),
-                        shape = RoundedCornerShape(20.dp)
-                    )
-                    .border(1.dp, Color.Black.copy(alpha = 0.7f), RoundedCornerShape(20.dp))
-                    .padding(horizontal = 12.dp),
-                decorationBox = { innerTextField ->
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        if (commentText.isEmpty()) {
-                            Text(
-                                text = "Add comment",
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        innerTextField()
-                    }
-                }
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            IconButton(
-                onClick = onSendClick,
-                enabled = commentText.isNotBlank()
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = "Send Comment",
-                    tint = if (commentText.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.size(32.dp)
+        BasicTextField(
+            value = commentText,
+            onValueChange = onCommentChange,
+            textStyle = TextStyle(fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface),
+            modifier = Modifier
+                .weight(1f)
+                .height(40.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f),
+                    shape = RoundedCornerShape(20.dp)
                 )
+                .border(1.dp, Color.Black.copy(alpha = 0.15f), RoundedCornerShape(20.dp))
+                .padding(horizontal = 12.dp),
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    if (commentText.isEmpty()) {
+                        Text(
+                            text = "Add comment",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    innerTextField()
+                }
             }
+        )
+
+        Spacer(modifier = Modifier.width(4.dp))
+
+        IconButton(
+            onClick = onSendClick,
+            enabled = commentText.isNotBlank()
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Send,
+                contentDescription = "Send Comment",
+                tint = if (commentText.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                modifier = Modifier.size(28.dp)
+            )
         }
     }
 }

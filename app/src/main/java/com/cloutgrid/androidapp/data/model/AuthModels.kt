@@ -1,5 +1,6 @@
 package com.cloutgrid.androidapp.data.model
 
+import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -43,3 +44,9 @@ data class LoginResponse(
 
 @Serializable
 class EmptyResponse
+
+data class HeaderAction(
+    val icon: ImageVector,
+    val contentDescription: String,
+    val onClick: () -> Unit
+)

@@ -133,33 +133,53 @@ class APIService @Inject constructor(
     /**
      * Handles multipart form submissions automatically.
      */
-    suspend inline fun <reified T> uploadMultipart(
+    suspend inline fun <reified T> multipartRequest(
         endpoint: String,
-        imageFile: File?,
+        method: String, // 🌟 1. Pass the method dynamically ("POST", "PUT", etc.)
+        imageBytes: ByteArray?,
         imageKey: String?,
         params: Map<String, String>,
         requireAuth: Boolean
     ): T {
-        val response: HttpResponse = client.submitFormWithBinaryData(
-            url = "$baseURL$endpoint",
-            formData = formData {
-                params.forEach { (key, value) ->
-                    append(key, value)
+        val response: HttpResponse = try {
+            client.submitFormWithBinaryData(
+                url = "$baseURL$endpoint",
+                formData = formData {
+                    params.forEach { (key, value) ->
+                        append(key, value)
+                    }
+                    if (imageBytes != null && imageKey != null) {
+                        append(imageKey, imageBytes, Headers.build {
+                            append(HttpHeaders.ContentType, "image/jpeg")
+                            append(HttpHeaders.ContentDisposition, "filename=\"profile.jpg\"")
+                        })
+                    }
                 }
-                if (imageFile != null && imageKey != null) {
-                    append(imageKey, imageFile.readBytes(), Headers.build {
-                        append(HttpHeaders.ContentType, "image/jpeg")
-                        append(HttpHeaders.ContentDisposition, "filename=\"post.jpg\"")
-                    })
-                }
+            ) {
+                this.method = HttpMethod.parse(method)
+
+                if (!requireAuth) attributes.put(AuthCircuitBreaker, Unit)
             }
-        ) {
-            if (!requireAuth) attributes.put(AuthCircuitBreaker, Unit)
+        } catch (e: Exception) {
+            throw APIError.ServerError(e.message ?: "Network upload failed")
         }
 
-        if (!response.status.isSuccess())
-            throw APIError.ServerError("Multipart upload failed.")
+        // ... keeping the rest of your excellent error parsing and decoding logic exactly the same ...
+        if (!response.status.isSuccess()) {
+            val errorText = response.bodyAsText()
+            val serverMessage = try {
+                Json.parseToJsonElement(errorText).jsonObject["message"]?.jsonPrimitive?.content
+            } catch (e: Exception) {
+                null
+            } ?: "An error occurred status code: ${response.status.value}"
 
-        return response.body<T>()
+            throw APIError.ServerError(serverMessage)
+        }
+
+        return try {
+            response.body<T>()
+        } catch (e: Exception) {
+            throw APIError.DecodingError("Failed to decode response mapping.")
+        }
     }
 }

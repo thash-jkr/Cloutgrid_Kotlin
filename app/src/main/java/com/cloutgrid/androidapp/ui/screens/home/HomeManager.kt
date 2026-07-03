@@ -88,7 +88,15 @@ class HomeManager @Inject constructor(
     fun likePost(postID: Int) {
         viewModelScope.launch {
             try {
-                homeRepository.likePost(postID)
+                val response = homeRepository.likePost(postID)
+
+                val index = posts.indexOfFirst { it.id == postID }
+                if (index != -1) {
+                    posts[index] = posts[index].copy(
+                        likeCount = response.likeCount,
+                        isLiked = response.liked
+                    )
+                }
             } catch (e: Exception) {
                 println(e.localizedMessage)
             }
@@ -129,6 +137,11 @@ class HomeManager @Inject constructor(
             try {
                 val newComment = homeRepository.addComment(postID, content)
                 comments.add(0, newComment)
+
+                val postIndex = posts.indexOfFirst { it.id == postID }
+                if (postIndex != -1) {
+                    posts[postIndex] = posts[postIndex].copy(commentCount = posts[postIndex].commentCount + 1)
+                }
             } catch (e: Exception) {
                 errorMessage = e.localizedMessage
             } finally {
@@ -143,10 +156,13 @@ class HomeManager @Inject constructor(
             try {
                 homeRepository.deleteComment(postID, commentID)
                 comments.removeAll { it.id == commentID }
-                Toast.makeText(context, "Comment deleted", Toast.LENGTH_SHORT).show()
+
+                val postIndex = posts.indexOfFirst { it.id == postID }
+                if (postIndex != -1) {
+                    posts[postIndex] = posts[postIndex].copy(commentCount = posts[postIndex].commentCount - 1)
+                }
             } catch (e: Exception) {
                 errorMessage = e.localizedMessage
-                Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
             }
         }
     }

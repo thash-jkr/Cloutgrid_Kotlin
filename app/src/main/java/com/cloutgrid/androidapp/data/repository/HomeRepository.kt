@@ -61,21 +61,13 @@ class HomeRepository @Inject constructor(
         posts.add(0, post)
     }
 
-    suspend fun likePost(postID: Int) {
-        val response = apiService.request<LikeResponse>(
+    suspend fun likePost(postID: Int): LikeResponse {
+        return apiService.request<LikeResponse>(
             endpoint = "/posts/$postID/like/",
             method = "POST",
             body = emptyMap<String, String>(),
             requireAuth = true
         )
-
-        val index = posts.indexOfFirst { it.id == postID }
-        if (index != -1) {
-            posts[index] = posts[index].copy(
-                likeCount = response.likeCount,
-                isLiked = response.liked
-            )
-        }
     }
 
     suspend fun deletePost(postID: Int) {
@@ -96,18 +88,12 @@ class HomeRepository @Inject constructor(
     }
 
     suspend fun addComment(postID: Int, content: String): CommentModel {
-        val newComment = apiService.request<CommentModel>(
+        return apiService.request<CommentModel>(
             endpoint = "/posts/$postID/comments/",
             method = "POST",
             body = mapOf("content" to content),
             requireAuth = true
         )
-
-        val index = posts.indexOfFirst { it.id == postID }
-        if (index != -1) {
-            posts[index] = posts[index].copy(commentCount = posts[index].commentCount + 1)
-        }
-        return newComment
     }
 
     suspend fun deleteComment(postID: Int, commentID: Int) {
@@ -116,10 +102,5 @@ class HomeRepository @Inject constructor(
             method = "DELETE",
             requireAuth = true
         )
-
-        val index = posts.indexOfFirst { it.id == postID }
-        if (index != -1) {
-            posts[index] = posts[index].copy(commentCount = posts[index].commentCount - 1)
-        }
     }
 }

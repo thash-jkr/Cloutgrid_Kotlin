@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cloutgrid.androidapp.models.CategoryList
+import com.cloutgrid.androidapp.ui.components.CategorySheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,84 +146,11 @@ fun MoreInfoScreen(type: String, onNavigateBack: () -> Unit) {
                 modifier = Modifier.fillMaxSize(),
                 contentWindowInsets = { WindowInsets.statusBars }
             ) {
-                CategorySheet(categories) { cat ->
+                CategorySheet(categories, selectedCategory) { cat ->
                     selectedCategory = cat.value
                     showCategorySheet = false
                 }
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CategorySheet(
-    categories: List<CategoryList>,
-    onCategorySelected: (CategoryList) -> Unit
-) {
-    Column {
-        Row (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Select Category",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        HorizontalDivider(
-            thickness = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentPadding = PaddingValues(
-                start = 16.dp,
-                top = 16.dp,
-                end = 16.dp,
-                bottom = 100.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    categories.forEachIndexed { index, category ->
-                        Text(
-                            text = category.label,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onCategorySelected(category) }
-                                .padding(horizontal = 20.dp, vertical = 16.dp)
-                        )
-
-                        if (index < categories.lastIndex) {
-                            HorizontalDivider(
-                                modifier = Modifier.padding(horizontal = 20.dp),
-                                thickness = 0.5.dp
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MoreInfoScreenPreview() {
-    MoreInfoScreen("Creator", {})
-//    CategorySheet(CategoryList.allOptions, {})
 }

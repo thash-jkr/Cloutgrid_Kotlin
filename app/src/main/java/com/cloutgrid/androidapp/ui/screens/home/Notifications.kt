@@ -18,6 +18,9 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.cloutgrid.androidapp.data.model.NotificationModel
+import com.cloutgrid.androidapp.ui.components.CloutHeader
+import com.cloutgrid.androidapp.ui.components.Empty
+import com.cloutgrid.androidapp.ui.theme.OffWhite
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,34 +32,29 @@ fun Notifications(
     }
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
-            Column {
-                CenterAlignedTopAppBar(
-                    title = { Text(text = "Notifications", style = MaterialTheme.typography.titleMedium) }
-                )
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-                )
-            }
+            CloutHeader(
+                title = "Notifications"
+            )
         }
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = innerPadding.calculateTopPadding())
         ) {
             if (home.notifications.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier
+                        .background(Color.White)
                         .fillMaxSize(),
                     contentPadding = PaddingValues(
                         start = 16.dp,
-                        top = 16.dp,
+                        top = innerPadding.calculateTopPadding(),
                         end = 16.dp,
                         bottom = 100.dp
                     ),
-                    verticalArrangement = Arrangement.spacedBy(2.dp) // Forces rows to lock flush against each other
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     itemsIndexed(
                         items = home.notifications,
@@ -65,7 +63,10 @@ fun Notifications(
                         val cardShape = when {
                             home.notifications.size == 1 -> RoundedCornerShape(20.dp)
                             index == 0 -> RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-                            index == home.notifications.lastIndex -> RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
+                            index == home.notifications.lastIndex -> RoundedCornerShape(
+                                bottomStart = 20.dp,
+                                bottomEnd = 20.dp
+                            )
                             else -> RectangleShape
                         }
 
@@ -78,15 +79,10 @@ fun Notifications(
                     }
                 }
             } else {
-                EmptyNotificationView(type = "general", message = "No new notifications!")
+                Empty(type = "general", message = "No new notifications!")
             }
         }
     }
-}
-
-@Composable
-fun EmptyNotificationView(type: String, message: String) {
-    TODO("Not yet implemented")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -120,7 +116,7 @@ fun NotificationDismissRow(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(shape) // 🌟 2. Keeps the red swipe background clipped inside the round container corner track
+                    .clip(shape)
                     .background(backgroundColor)
                     .padding(horizontal = 20.dp),
                 contentAlignment = Alignment.CenterEnd
@@ -136,7 +132,7 @@ fun NotificationDismissRow(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(shape) // 🌟 3. Ensures row content cuts cleanly to fit the container grouping
+                    .clip(shape)
             ) {
                 ListItem(
                     headlineContent = {
@@ -145,13 +141,11 @@ fun NotificationDismissRow(
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
-                    // Stripped out leadingContent and supportingContent to isolate text content only
                     colors = ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh // 🌟 Matches the soft light card block color
+                        containerColor = OffWhite
                     )
                 )
 
-                // 🌟 4. Fine hair-line separator between stacked notification items
                 if (showDivider) {
                     HorizontalDivider(
                         color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),

@@ -10,9 +10,11 @@ import com.cloutgrid.androidapp.data.model.UserContainer
 import com.cloutgrid.androidapp.data.network.APIService
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -51,6 +53,37 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    suspend fun updateProfile(
+        userType: String,
+        data: Map<String, String>,
+        imageBytes: ByteArray?
+    ) {
+        val endpoint = "/profile/${userType}/"
+
+        val updatedUser: UserContainer = apiService.get().multipartRequest(
+            endpoint = endpoint,
+            method = "PUT",
+            imageBytes = imageBytes,
+            imageKey = "user[profile_photo]",
+            params = data,
+            requireAuth = true
+        )
+
+        saveUser(updatedUser)
+    }
+
+    private suspend fun saveUser(user: UserContainer) = withContext(Dispatchers.IO) {
+        try {
+            val encoded = json.encodeToString(user)
+
+            dataStore.edit { preferences ->
+                preferences[PreferencesKeys.USER_DATA] = encoded
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     suspend fun login(email: String, password: String, userType: String) {
         val response: LoginResponse = apiService.get().request(
             endpoint = "/login/$userType/",
@@ -62,7 +95,6 @@ class AuthRepository @Inject constructor(
         saveSession(response, userType)
     }
 
-    // 🚀 NEW LOGOUT METHOD
     suspend fun logout() {
         val refreshToken = refresh.first() ?: ""
         try {
@@ -73,8 +105,7 @@ class AuthRepository @Inject constructor(
                 requireAuth = true
             )
         } catch (e: Exception) {
-            // Log network errors if needed, but we ALWAYS clear local credentials
-            // so the user isn't locked into a broken session state.
+            e.printStackTrace()
         } finally {
             clearSession()
         }

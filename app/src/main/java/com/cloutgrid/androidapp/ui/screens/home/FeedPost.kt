@@ -57,7 +57,7 @@ fun FeedPost(
     post: PostModel,
     onLikeClick: () -> Unit,
     onCommentClick: () -> Unit,
-    onUserClick: (userId: Int) -> Unit,
+    onUserClick: (username: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isLiked = post.isLiked
@@ -106,15 +106,14 @@ fun FeedPost(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RectangleShape
     ) {
         Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-                    .clickable { onUserClick(post.author.id) },
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AsyncImage(
@@ -128,26 +127,30 @@ fun FeedPost(
 
                 Spacer(modifier = Modifier.width(10.dp))
 
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp
+                Row {
+                    Text(
+                        text = post.author.name,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .clickable { onUserClick(post.author.username) }
+                    )
+
+                    if (post.collaboration != null) {
+                        Text(
+                            text = " with ",
+                            color = Color.Gray
                         )
-                        ) {
-                            append(post.author.name)
-                        }
-                        if (post.collaboration != null) {
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Normal, color = Color.Gray, fontSize = 13.sp)) {
-                                append(" with ")
-                            }
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontSize = 14.sp)) {
-                                append(post.collaboration.profile.name)
-                            }
-                        }
-                    },
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+
+                        Text(
+                            text = post.collaboration.profile.name,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .clickable { onUserClick(post.collaboration.profile.username) }
+                        )
+                    }
+                }
             }
 
             AsyncImage(
@@ -166,7 +169,7 @@ fun FeedPost(
                         )
                     }
                     .fillMaxWidth(),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.FillWidth
             )
 
             Row(
