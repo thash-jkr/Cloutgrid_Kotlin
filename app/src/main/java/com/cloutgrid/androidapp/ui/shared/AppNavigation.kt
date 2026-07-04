@@ -103,7 +103,15 @@ fun AppNavigation() {
 
             OtherProfile(
                 username = args.username,
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToPostDetail = { post: PostModel, other: Boolean ->
+                    navController.navigate(
+                        PostDetailRoute(
+                            post.id,
+                            other = other
+                        )
+                    )
+                }
             )
         }
     }

@@ -205,7 +205,6 @@ private fun CommentRow(
 
                     Text(
                         text = comment.content,
-                        fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurface,
                         style = TextStyle(
                             lineHeight = 1.2.em

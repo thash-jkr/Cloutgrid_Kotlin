@@ -34,7 +34,9 @@ import coil3.compose.AsyncImage
 import com.cloutgrid.androidapp.data.model.HeaderAction
 import com.cloutgrid.androidapp.data.model.PostModel
 import com.cloutgrid.androidapp.ui.components.CloutHeader
+import com.cloutgrid.androidapp.ui.screens.integration.Instagram
 import com.cloutgrid.androidapp.ui.screens.integration.InstagramConstants
+import com.cloutgrid.androidapp.ui.screens.integration.YouTube
 import com.cloutgrid.androidapp.ui.screens.integration.YoutubeConstants
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +61,7 @@ fun ProfileScreen(
     }
 
     LaunchedEffect(user) {
-        if (profile.posts.isEmpty()) {
+        if (user != null && profile.posts.isEmpty()) {
             profile.fetchPosts(user?.profile?.username ?: "", false)
         }
     }
@@ -103,7 +105,7 @@ fun ProfileScreen(
                 }
 
                 item {
-                    ProfileCapsuleSelector(
+                    ProfileSelector(
                         tabs,
                         selectedTab,
                         onTabSelected = { selectedTab = it }
@@ -119,13 +121,19 @@ fun ProfileScreen(
                     }
                     "Instagram" -> {
                         item {
-                            InstagramConstants()
+                            Instagram()
                         }
                     }
                     "YouTube" -> {
                         item {
-                            YoutubeConstants()
+                            YouTube()
                         }
+                    }
+                    "Collabs" -> {
+                        postGridItems(
+                            posts = profile.collabs,
+                            onPostClick = { post -> onNavigateToPostDetail(post, false) }
+                        )
                     }
                 }
             }

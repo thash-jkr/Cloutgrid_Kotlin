@@ -28,6 +28,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.cloutgrid.androidapp.R
 import com.cloutgrid.androidapp.data.model.HeaderAction
+import com.cloutgrid.androidapp.data.model.PostModel
 import com.cloutgrid.androidapp.ui.components.CloutHeader
 import com.cloutgrid.androidapp.ui.components.CloutSheet
 import com.cloutgrid.androidapp.ui.components.LoadingSpinner
@@ -41,7 +42,8 @@ fun HomeScreen(
     scaffoldPadding: PaddingValues,
     onNavigateToChatScreen: () -> Unit,
     onNavigateToOtherProfile: (String) -> Unit,
-    onSelectTab: (TabItem) -> Unit
+    onSelectTab: (TabItem) -> Unit,
+    onNavigateToPostDetail: (PostModel, Boolean) -> Unit
 ) {
     var showNotificationSheet by remember { mutableStateOf(false) }
     val notificationSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -150,7 +152,6 @@ fun HomeScreen(
                                 } else {
                                     onNavigateToOtherProfile(username)
                                 }
-
                             }
                         }
                     )

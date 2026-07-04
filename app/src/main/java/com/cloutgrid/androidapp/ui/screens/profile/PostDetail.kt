@@ -31,10 +31,18 @@ fun PostDetail(
     other: Boolean,
     profile: ProfileManager = hiltViewModel()
 ) {
-    val post = if (other) {
+    var post = if (other) {
         profile.otherPosts.find { it.id == id }
     } else {
         profile.posts.find { it.id == id }
+    }
+
+    if (post == null) {
+        post = if (other) {
+            profile.otherCollabs.find { it.id == id }
+        } else {
+            profile.collabs.find { it.id == id }
+        }
     }
 
     var showCommentsSheet by remember { mutableStateOf(false) }

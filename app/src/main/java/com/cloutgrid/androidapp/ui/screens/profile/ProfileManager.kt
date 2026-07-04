@@ -40,8 +40,8 @@ class ProfileManager @Inject constructor(
     var otherProfile by mutableStateOf<UserContainer?>(null)
         private set
 
-    val otherPosts = mutableStateListOf<PostModel>()
-    val otherCollabs = mutableStateListOf<PostModel>()
+    val otherPosts get() = profileRepository.otherPosts
+    val otherCollabs get() = profileRepository.otherCollabs
 
     val comments = mutableStateListOf<CommentModel>()
 
@@ -51,20 +51,23 @@ class ProfileManager @Inject constructor(
     var errorMessage by mutableStateOf<String?>(null)
         private set
 
-    suspend fun fetchProfile(username: String, other: Boolean) {
-        isLoading = true
-        errorMessage = null
-        if (other) otherProfile = null
+    fun fetchProfile(username: String, other: Boolean) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = null
+            if (other) otherProfile = null
 
-        try {
-            val response = profileRepository.fetchProfile(username)
-            if (other) {
-                otherProfile = response
+            try {
+                val response = profileRepository.fetchProfile(username)
+
+                if (other) {
+                    otherProfile = response
+                }
+            } catch (e: Exception) {
+                errorMessage = e.localizedMessage ?: "An error occurred"
+            } finally {
+                isLoading = false
             }
-            isLoading = false
-        } catch (e: Exception) {
-            isLoading = false
-            errorMessage = e.localizedMessage ?: "An error occurred"
         }
     }
 
@@ -88,20 +91,18 @@ class ProfileManager @Inject constructor(
         }
     }
 
-    suspend fun fetchPosts(username: String, other: Boolean = false) {
-        isLoading = true
-        errorMessage = null
-        if (other) otherPosts.clear()
+    fun fetchPosts(username: String, other: Boolean = false) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = null
 
-        try {
-            val response = profileRepository.fetchPosts(username, other)
-            if (other) {
-                otherPosts.addAll(response)
+            try {
+                profileRepository.fetchPosts(username, other)
+            } catch (e: Exception) {
+                errorMessage = e.localizedMessage ?: "An error occurred"
+            } finally {
+                isLoading = false
             }
-            isLoading = false
-        } catch (e: Exception) {
-            isLoading = false
-            errorMessage = e.localizedMessage ?: "An error occurred"
         }
     }
 
@@ -121,6 +122,22 @@ class ProfileManager @Inject constructor(
                 val collabIndex = collabs.indexOfFirst { it.id == postID }
                 if (collabIndex != -1) {
                     collabs[collabIndex] = collabs[collabIndex].copy(
+                        likeCount = response.likeCount,
+                        isLiked = response.liked
+                    )
+                }
+
+                val otherPostIndex = otherPosts.indexOfFirst { it.id == postID }
+                if (otherPostIndex != -1) {
+                    otherPosts[otherPostIndex] = otherPosts[otherPostIndex].copy(
+                        likeCount = response.likeCount,
+                        isLiked = response.liked
+                    )
+                }
+
+                val otherCollabIndex = otherCollabs.indexOfFirst { it.id == postID }
+                if (otherCollabIndex != -1) {
+                    otherCollabs[otherCollabIndex] = otherCollabs[otherCollabIndex].copy(
                         likeCount = response.likeCount,
                         isLiked = response.liked
                     )
@@ -188,65 +205,61 @@ class ProfileManager @Inject constructor(
         }
     }
 
-    suspend fun fetchCollabs(username: String, other: Boolean = false) {
-        isLoading = true
-        errorMessage = null
-        if (other) otherCollabs.clear()
+    fun fetchCollabs(username: String, other: Boolean = false) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = null
 
-        try {
-            val response = profileRepository.fetchCollabs(username, other)
-            if (other) {
-                otherCollabs.addAll(response)
+            try {
+                profileRepository.fetchCollabs(username, other)
+            } catch (e: Exception) {
+                errorMessage = e.localizedMessage ?: "An error occurred"
+            } finally {
+                isLoading = false
             }
-            isLoading = false
-        } catch (e: Exception) {
-            isLoading = false
-            errorMessage = e.localizedMessage ?: "An error occurred"
         }
     }
 
-    suspend fun handleBlock(username: String, block: Boolean) {
-        isLoading = true
-        errorMessage = null
+    fun handleBlock(username: String, block: Boolean) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = null
 
-        try {
-            profileRepository.handleBlock(username, block)
+            try {
+                profileRepository.handleBlock(username, block)
 
-            Toast.makeText(
-                context,
-                "You have ${if (block) "blocked" else "unblocked"} @$username",
-                Toast.LENGTH_SHORT
-            ).show()
+                Toast.makeText(
+                    context,
+                    "You have ${if (block) "blocked" else "unblocked"} @$username",
+                    Toast.LENGTH_SHORT
+                ).show()
 
-            otherProfile = otherProfile?.copy(isBlocking = block)
-            isLoading = false
-        } catch (e: Exception) {
-            errorMessage = e.localizedMessage ?: "An error occurred"
-            isLoading = false
+                otherProfile = otherProfile?.copy(isBlocking = block)
+            } catch (e: Exception) {
+                errorMessage = e.localizedMessage ?: "An error occurred"
+            } finally {
+                isLoading = false
+            }
         }
     }
 
-    suspend fun handleFollow(username: String, follow: Boolean) {
-        errorMessage = null
+    fun handleFollow(username: String, follow: Boolean) {
+        viewModelScope.launch {
+            errorMessage = null
 
-        try {
-            profileRepository.handleFollow(username, follow)
+            try {
+                profileRepository.handleFollow(username, follow)
 
-            Toast.makeText(
-                context,
-                "You have ${if (follow) "followed" else "unfollowed"} @$username",
-                Toast.LENGTH_SHORT
-            ).show()
-
-            otherProfile = otherProfile?.let { currentProfile ->
-                val updatedCount = currentProfile.profile.followersCount + (if (follow) 1 else -1)
-                currentProfile.copy(
-                    isFollowing = follow,
-                    profile = currentProfile.profile.copy(followersCount = updatedCount)
-                )
+                otherProfile = otherProfile?.let { currentProfile ->
+                    val updatedCount = currentProfile.profile.followersCount + (if (follow) 1 else -1)
+                    currentProfile.copy(
+                        isFollowing = follow,
+                        profile = currentProfile.profile.copy(followersCount = updatedCount)
+                    )
+                }
+            } catch (e: Exception) {
+                errorMessage = e.localizedMessage ?: "An error occurred"
             }
-        } catch (e: Exception) {
-            errorMessage = e.localizedMessage ?: "An error occurred"
         }
     }
 

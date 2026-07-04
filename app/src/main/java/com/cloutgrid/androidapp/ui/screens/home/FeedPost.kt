@@ -120,7 +120,7 @@ fun FeedPost(
                     model = post.author.profilePhoto,
                     contentDescription = "Profile Picture",
                     modifier = Modifier
-                        .size(25.dp)
+                        .size(30.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
@@ -186,7 +186,6 @@ fun FeedPost(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null
                         ) {
-
                             if (!post.isLiked) triggerBounce()
                             onLikeClick()
                         },
@@ -207,7 +206,14 @@ fun FeedPost(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "${post.likeCount} hits",
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("${post.likeCount} ")
+                            }
+                            withStyle(style = SpanStyle(color = Color.Gray)) {
+                                append("Likes")
+                            }
+                        },
                         fontSize = 15.sp
                     )
 
@@ -219,7 +225,14 @@ fun FeedPost(
                     )
 
                     Text(
-                        text = "${post.commentCount} comments",
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("${post.commentCount} ")
+                            }
+                            withStyle(style = SpanStyle(color = Color.Gray)) {
+                                append("Comments")
+                            }
+                        },
                         fontSize = 15.sp
                     )
                 }
@@ -245,7 +258,6 @@ fun FeedPost(
                         }
                         append(post.caption)
                     },
-                    fontSize = 14.sp,
                     lineHeight = 18.sp,
                     modifier = Modifier.padding(bottom = 6.dp)
                 )

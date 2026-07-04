@@ -48,5 +48,12 @@ class EmptyResponse
 data class HeaderAction(
     val icon: ImageVector,
     val contentDescription: String,
+    val onClick: () -> Unit,
+    val menuItems: List<MenuAction>? = null
+)
+
+data class MenuAction(
+    val title: String,
+    val icon: ImageVector,
     val onClick: () -> Unit
 )

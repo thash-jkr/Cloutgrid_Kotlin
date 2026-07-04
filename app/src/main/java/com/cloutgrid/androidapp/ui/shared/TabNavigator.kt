@@ -132,7 +132,8 @@ fun TabNavigator(
                     scaffoldPadding = paddingValues,
                     onSelectTab = selectTab,
                     onNavigateToChatScreen = onNavigateToChatScreen,
-                    onNavigateToOtherProfile = onNavigateToOtherProfile
+                    onNavigateToOtherProfile = onNavigateToOtherProfile,
+                    onNavigateToPostDetail = onNavigateToPostDetail
                 )
                 TabItem.Search -> Box(Modifier.fillMaxSize().padding(paddingValues)) { SearchScreen() }
                 TabItem.Create -> Box(Modifier.fillMaxSize().padding(paddingValues)) { CreateScreen() }

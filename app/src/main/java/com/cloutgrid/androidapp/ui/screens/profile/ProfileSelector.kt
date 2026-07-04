@@ -25,7 +25,7 @@ import com.cloutgrid.androidapp.ui.theme.Second
 import com.cloutgrid.androidapp.R
 
 @Composable
-fun ProfileCapsuleSelector(
+fun ProfileSelector(
     tabs: List<String>,
     selectedTab: String,
     onTabSelected: (String) -> Unit,
@@ -64,7 +64,7 @@ fun ProfileCapsuleSelector(
                                 tint = Color.White
                             )
                         }
-                        "Collab" -> {
+                        "Collabs" -> {
                             Icon(
                                 imageVector = Icons.Filled.Handshake,
                                 contentDescription = "Collab",

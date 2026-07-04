@@ -18,6 +18,9 @@ class ProfileRepository @Inject constructor(
     val posts = mutableStateListOf<PostModel>()
     val collabs = mutableStateListOf<PostModel>()
 
+    val otherPosts = mutableStateListOf<PostModel>()
+    val otherCollabs = mutableStateListOf<PostModel>()
+
     suspend fun fetchProfile(username: String): UserContainer = withContext(Dispatchers.IO) {
         apiService.request<UserContainer>(
             endpoint = "/profiles/$username/",
@@ -26,7 +29,9 @@ class ProfileRepository @Inject constructor(
         )
     }
 
-    suspend fun fetchPosts(username: String, other: Boolean): List<PostModel> = withContext(Dispatchers.IO) {
+    suspend fun fetchPosts(username: String, other: Boolean) = withContext(Dispatchers.IO) {
+        if (other) otherPosts.clear()
+
         val response = apiService.request<List<PostModel>>(
             endpoint = "/posts/$username/",
             method = "GET",
@@ -39,12 +44,19 @@ class ProfileRepository @Inject constructor(
                 posts.clear()
                 posts.addAll(response)
             }
+        } else {
+            withContext(Dispatchers.Main) {
+                otherPosts.clear()
+                otherPosts.addAll(response)
+            }
         }
-        response
     }
 
-    suspend fun fetchCollabs(username: String, other: Boolean): List<PostModel> = withContext(Dispatchers.IO) {
+    suspend fun fetchCollabs(username: String, other: Boolean) = withContext(Dispatchers.IO) {
         val endpoint = if (other) "/posts/collabs/$username/" else "/posts/collabs/"
+
+        if (other) otherCollabs.clear()
+
         val response = apiService.request<List<PostModel>>(
             endpoint = endpoint,
             method = "GET",
@@ -57,8 +69,12 @@ class ProfileRepository @Inject constructor(
                 collabs.clear()
                 collabs.addAll(response)
             }
+        } else {
+            withContext(Dispatchers.Main) {
+                otherCollabs.clear()
+                otherCollabs.addAll(response)
+            }
         }
-        response
     }
 
     suspend fun handleBlock(username: String, block: Boolean): EmptyResponse = withContext(Dispatchers.IO) {
