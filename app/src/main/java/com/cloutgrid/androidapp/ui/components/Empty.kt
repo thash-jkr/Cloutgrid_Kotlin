@@ -3,6 +3,8 @@ package com.cloutgrid.androidapp.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.cloutgrid.androidapp.R
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun Empty(
     type: String,
@@ -46,7 +49,7 @@ fun Empty(
         )
 
         if (isLoading) {
-            LoadingSpinner()
+            LoadingIndicator()
         } else {
             Text(
                 text = message,

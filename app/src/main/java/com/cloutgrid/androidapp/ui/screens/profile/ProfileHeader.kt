@@ -21,6 +21,7 @@ import coil3.compose.AsyncImage
 import com.cloutgrid.androidapp.data.model.UserContainer
 import com.cloutgrid.androidapp.data.network.ApiConfig
 import com.cloutgrid.androidapp.models.CategoryList
+import com.cloutgrid.androidapp.ui.components.CloutCapsule
 import com.cloutgrid.androidapp.ui.theme.First
 import com.cloutgrid.androidapp.ui.theme.Second
 
@@ -69,16 +70,7 @@ fun ProfileHeader(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val categoryLabel = CategoryList.label(user.area ?: user.targetAudience ?: "")
-                Text(
-                    text = categoryLabel,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    modifier = Modifier
-                        .background(Second, shape = CircleShape) // CircleShape automatically scales like a Capsule
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                )
+                CloutCapsule(user.area ?: user.targetAudience ?: "Creator")
 
                 if (!user.website.isNullOrEmpty()) {
                     Row(

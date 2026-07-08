@@ -34,6 +34,7 @@ import coil3.compose.AsyncImage
 import com.cloutgrid.androidapp.data.model.HeaderAction
 import com.cloutgrid.androidapp.data.model.PostModel
 import com.cloutgrid.androidapp.ui.components.CloutHeader
+import com.cloutgrid.androidapp.ui.components.Empty
 import com.cloutgrid.androidapp.ui.screens.integration.Instagram
 import com.cloutgrid.androidapp.ui.screens.integration.InstagramConstants
 import com.cloutgrid.androidapp.ui.screens.integration.YouTube
@@ -114,10 +115,20 @@ fun ProfileScreen(
 
                 when(selectedTab) {
                     "Posts" -> {
-                        postGridItems(
-                            posts = profile.posts,
-                            onPostClick = { post -> onNavigateToPostDetail(post, false) }
-                        )
+                        if (profile.posts.isEmpty()) {
+                            item {
+                                Empty(
+                                    type = "post",
+                                    message = "No posts found",
+                                    isLoading = profile.isLoading
+                                )
+                            }
+                        } else {
+                            postGridItems(
+                                posts = profile.posts,
+                                onPostClick = { post -> onNavigateToPostDetail(post, false) }
+                            )
+                        }
                     }
                     "Instagram" -> {
                         item {
@@ -130,10 +141,20 @@ fun ProfileScreen(
                         }
                     }
                     "Collabs" -> {
-                        postGridItems(
-                            posts = profile.collabs,
-                            onPostClick = { post -> onNavigateToPostDetail(post, false) }
-                        )
+                        if (profile.posts.isEmpty()) {
+                            item {
+                                Empty(
+                                    type = "post",
+                                    message = "No collab posts found",
+                                    isLoading = profile.isLoading
+                                )
+                            }
+                        } else {
+                            postGridItems(
+                                posts = profile.collabs,
+                                onPostClick = { post -> onNavigateToPostDetail(post, false) }
+                            )
+                        }
                     }
                 }
             }

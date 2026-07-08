@@ -116,7 +116,10 @@ fun CloutHeader(
         ),
         modifier = Modifier.background(
             brush = Brush.verticalGradient(
-                colors = if (actions.isEmpty() && icon == null) {
+                colors = if (title in listOf(
+                    "Notifications",
+                    "Comments",
+                )) {
                     listOf(
                         Color.White.copy(alpha = 1f),
                         Color.White.copy(alpha = 0.8f),

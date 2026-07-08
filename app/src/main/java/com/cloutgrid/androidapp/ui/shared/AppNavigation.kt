@@ -1,11 +1,13 @@
 package com.cloutgrid.androidapp.ui.shared
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.cloutgrid.androidapp.data.model.PostModel
+import com.cloutgrid.androidapp.ui.screens.create.CreatePost
 import com.cloutgrid.androidapp.ui.screens.messaging.ChatScreen
 import com.cloutgrid.androidapp.ui.screens.profile.EditProfile
 import com.cloutgrid.androidapp.ui.screens.profile.OtherProfile
@@ -13,6 +15,7 @@ import com.cloutgrid.androidapp.ui.screens.profile.Settings
 import com.cloutgrid.androidapp.ui.screens.profile.Security
 import com.cloutgrid.androidapp.ui.screens.profile.PostDetail
 import kotlinx.serialization.Serializable
+import androidx.core.net.toUri
 
 @Serializable object TabNavigator
 @Serializable object ChatScreen
@@ -26,6 +29,9 @@ import kotlinx.serialization.Serializable
 )
 @Serializable data class OtherProfileRoute(
     val username: String
+)
+@Serializable data class CreatePostRoute(
+    val selectedImage: String
 )
 
 @Composable
@@ -58,6 +64,13 @@ fun AppNavigation() {
                 onNavigateToOtherProfile = { username: String ->
                     navController.navigate(
                         OtherProfileRoute(username)
+                    )
+                },
+                onNavigateToCreatePost = { selectedImage: Uri ->
+                    navController.navigate(
+                        CreatePostRoute(
+                            selectedImage.toString()
+                        )
                     )
                 }
             )
@@ -112,6 +125,15 @@ fun AppNavigation() {
                         )
                     )
                 }
+            )
+        }
+
+        composable<CreatePostRoute> { backStackEntry ->
+            val args = backStackEntry.toRoute<CreatePostRoute>()
+
+            CreatePost(
+                selectedImage = args.selectedImage.toUri(),
+                onNavigateBack = { navController.popBackStack() }
             )
         }
     }

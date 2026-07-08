@@ -41,6 +41,7 @@ import com.cloutgrid.androidapp.data.model.HeaderAction
 import com.cloutgrid.androidapp.data.model.MenuAction
 import com.cloutgrid.androidapp.data.model.PostModel
 import com.cloutgrid.androidapp.ui.components.CloutHeader
+import com.cloutgrid.androidapp.ui.components.Empty
 import com.cloutgrid.androidapp.ui.components.ReportBox
 import com.cloutgrid.androidapp.ui.screens.integration.InstagramConstants
 import com.cloutgrid.androidapp.ui.screens.integration.YoutubeConstants
@@ -66,14 +67,10 @@ fun OtherProfile(
     var showUnfollowDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(otherProfile) {
-        if (otherProfile != null) {
-            if (profile.otherPosts.isEmpty()) {
-                profile.fetchPosts(username, true)
-            }
+        profile.fetchPosts(username, true)
 
-            if (profile.otherCollabs.isEmpty() && otherProfile.profile.userType == "business") {
-                profile.fetchCollabs(username, true)
-            }
+        if (otherProfile?.profile?.userType == "business") {
+            profile.fetchCollabs(username, true)
         }
     }
 
@@ -176,10 +173,20 @@ fun OtherProfile(
 
                         when(selectedTab) {
                             "Posts" -> {
-                                postGridItems(
-                                    posts = profile.otherPosts,
-                                    onPostClick = { post -> onNavigateToPostDetail(post, true) }
-                                )
+                                if (profile.posts.isEmpty()) {
+                                    item {
+                                        Empty(
+                                            type = "post",
+                                            message = "No posts found",
+                                            isLoading = profile.isLoading
+                                        )
+                                    }
+                                } else {
+                                    postGridItems(
+                                        posts = profile.otherPosts,
+                                        onPostClick = { post -> onNavigateToPostDetail(post, true) }
+                                    )
+                                }
                             }
                             "Instagram" -> {
                                 item {
@@ -192,10 +199,20 @@ fun OtherProfile(
                                 }
                             }
                             "Collabs" -> {
-                                postGridItems(
-                                    posts = profile.otherCollabs,
-                                    onPostClick = { post -> onNavigateToPostDetail(post, true) }
-                                )
+                                if (profile.posts.isEmpty()) {
+                                    item {
+                                        Empty(
+                                            type = "post",
+                                            message = "No collab posts found",
+                                            isLoading = profile.isLoading
+                                        )
+                                    }
+                                } else {
+                                    postGridItems(
+                                        posts = profile.otherCollabs,
+                                        onPostClick = { post -> onNavigateToPostDetail(post, true) }
+                                    )
+                                }
                             }
                         }
                     }

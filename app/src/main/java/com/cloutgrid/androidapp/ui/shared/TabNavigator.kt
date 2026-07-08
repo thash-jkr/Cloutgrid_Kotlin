@@ -1,5 +1,6 @@
 package com.cloutgrid.androidapp.ui.shared
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -25,8 +26,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.cloutgrid.androidapp.data.model.PostModel
+import com.cloutgrid.androidapp.ui.screens.collab.CollabScreen
+import com.cloutgrid.androidapp.ui.screens.create.CreateScreen
 import com.cloutgrid.androidapp.ui.screens.home.HomeScreen
 import com.cloutgrid.androidapp.ui.screens.profile.ProfileScreen
+import com.cloutgrid.androidapp.ui.screens.search.SearchScreen
 import com.cloutgrid.androidapp.ui.theme.First
 import com.cloutgrid.androidapp.ui.theme.Second
 import kotlinx.coroutines.launch
@@ -46,6 +50,7 @@ fun TabNavigator(
     onNavigateToEditProfile: () -> Unit,
     onNavigateToPostDetail: (PostModel, Boolean) -> Unit,
     onNavigateToOtherProfile: (String) -> Unit,
+    onNavigateToCreatePost: (Uri) -> Unit,
 ) {
     val tabs = TabItem.entries.toTypedArray()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
@@ -135,9 +140,15 @@ fun TabNavigator(
                     onNavigateToOtherProfile = onNavigateToOtherProfile,
                     onNavigateToPostDetail = onNavigateToPostDetail
                 )
-                TabItem.Search -> Box(Modifier.fillMaxSize().padding(paddingValues)) { SearchScreen() }
-                TabItem.Create -> Box(Modifier.fillMaxSize().padding(paddingValues)) { CreateScreen() }
-                TabItem.Jobs -> Box(Modifier.fillMaxSize().padding(paddingValues)) { JobsScreen() }
+                TabItem.Search -> SearchScreen(
+                    scaffoldPadding = paddingValues,
+                    onSelectTab = selectTab,
+                    onNavigateToOtherProfile = onNavigateToOtherProfile
+                )
+                TabItem.Create -> CreateScreen(
+                    onNavigateToCreatePost = onNavigateToCreatePost
+                )
+                TabItem.Jobs -> CollabScreen()
                 TabItem.Profile -> ProfileScreen(
                     scaffoldPadding = paddingValues,
                     onNavigateToSettings = onNavigateToSettings,
@@ -148,7 +159,3 @@ fun TabNavigator(
         }
     }
 }
-
-@Composable fun SearchScreen() { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Search Screen") } }
-@Composable fun CreateScreen() { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Create Post Screen") } }
-@Composable fun JobsScreen() { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Jobs Screen") } }
