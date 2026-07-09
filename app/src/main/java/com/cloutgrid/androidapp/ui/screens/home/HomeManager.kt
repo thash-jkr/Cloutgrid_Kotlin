@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 class HomeManager @Inject constructor(
     authRepository: AuthRepository,
     private val homeRepository: HomeRepository,
-    @ApplicationContext private val context: Context,
 ) : ViewModel() {
     val user = authRepository.user.stateIn(
         scope = viewModelScope,

@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -22,7 +20,6 @@ import androidx.compose.ui.unit.Velocity
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CloutSheet(
-    sheetState: SheetState = rememberModalBottomSheetState(true),
     onDismiss: () -> Unit,
     content: @Composable () -> Unit
 ) {
@@ -43,7 +40,6 @@ fun CloutSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState,
         modifier = Modifier
             .statusBarsPadding()
             .fillMaxWidth(),
@@ -54,7 +50,7 @@ fun CloutSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White)
-                .nestedScroll(contentScrollConnection)
+//                .nestedScroll(contentScrollConnection)
         ) {
             content()
         }

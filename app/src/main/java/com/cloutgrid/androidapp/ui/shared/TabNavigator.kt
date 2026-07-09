@@ -138,7 +138,6 @@ fun TabNavigator(
                     onSelectTab = selectTab,
                     onNavigateToChatScreen = onNavigateToChatScreen,
                     onNavigateToOtherProfile = onNavigateToOtherProfile,
-                    onNavigateToPostDetail = onNavigateToPostDetail
                 )
                 TabItem.Search -> SearchScreen(
                     scaffoldPadding = paddingValues,
@@ -148,7 +147,9 @@ fun TabNavigator(
                 TabItem.Create -> CreateScreen(
                     onNavigateToCreatePost = onNavigateToCreatePost
                 )
-                TabItem.Jobs -> CollabScreen()
+                TabItem.Jobs -> CollabScreen(
+                    scaffoldPadding = paddingValues
+                )
                 TabItem.Profile -> ProfileScreen(
                     scaffoldPadding = paddingValues,
                     onNavigateToSettings = onNavigateToSettings,
