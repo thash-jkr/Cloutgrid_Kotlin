@@ -13,6 +13,7 @@ import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
@@ -130,12 +131,10 @@ class APIService @Inject constructor(
         }
     }
 
-    /**
-     * Handles multipart form submissions automatically.
-     */
+    @OptIn(InternalAPI::class)
     suspend inline fun <reified T> multipartRequest(
         endpoint: String,
-        method: String, // 🌟 1. Pass the method dynamically ("POST", "PUT", etc.)
+        method: String,
         imageBytes: ByteArray?,
         imageKey: String?,
         params: Map<String, String>,
@@ -164,7 +163,6 @@ class APIService @Inject constructor(
             throw APIError.ServerError(e.message ?: "Network upload failed")
         }
 
-        // ... keeping the rest of your excellent error parsing and decoding logic exactly the same ...
         if (!response.status.isSuccess()) {
             val errorText = response.bodyAsText()
             val serverMessage = try {

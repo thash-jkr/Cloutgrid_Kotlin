@@ -53,6 +53,7 @@ fun CloutSheet(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(Color.White)
                 .nestedScroll(contentScrollConnection)
         ) {
             content()
