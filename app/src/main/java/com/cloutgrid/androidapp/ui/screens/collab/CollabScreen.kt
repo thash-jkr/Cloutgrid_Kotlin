@@ -72,7 +72,7 @@ fun CollabScreen(
         }
     ) { innerPadding ->
         PullToRefreshBox(
-            isRefreshing = collab.isLoading,
+            isRefreshing = collab.isLoading && collab.jobs.isNotEmpty(),
             onRefresh = {
                 collab.fetchJobs()
             },

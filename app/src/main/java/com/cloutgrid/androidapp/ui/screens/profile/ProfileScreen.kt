@@ -88,8 +88,14 @@ fun ProfileScreen(
         }
     ) { innerPadding ->
         PullToRefreshBox(
-            isRefreshing = profile.isLoading,
-            onRefresh = { },
+            isRefreshing = profile.isLoading && profile.profile,
+            onRefresh = {
+                profile.fetchPosts(user?.profile?.username ?: "", false)
+
+                if (user?.profile?.userType == "business") {
+                    profile.fetchCollabs(user?.profile?.username ?: "", false)
+                }
+            },
             modifier = Modifier.fillMaxSize()
         ) {
             LazyColumn(

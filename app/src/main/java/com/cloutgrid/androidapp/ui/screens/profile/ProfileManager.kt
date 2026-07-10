@@ -37,6 +37,7 @@ class ProfileManager @Inject constructor(
     val posts get() = profileRepository.posts
     val collabs get() = profileRepository.collabs
 
+    var profile by mutableStateOf(false)
     var otherProfile by mutableStateOf<UserContainer?>(null)
         private set
 
@@ -98,6 +99,9 @@ class ProfileManager @Inject constructor(
 
             try {
                 profileRepository.fetchPosts(username, other)
+                if (!other) {
+                    profile = true
+                }
             } catch (e: Exception) {
                 errorMessage = e.localizedMessage ?: "An error occurred"
             } finally {

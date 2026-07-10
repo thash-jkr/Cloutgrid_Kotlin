@@ -54,7 +54,7 @@ fun OtherProfile(
     profile: ProfileManager = hiltViewModel(),
     onNavigateToPostDetail: (PostModel, Boolean) -> Unit
 ) {
-    LaunchedEffect(username) {
+    LaunchedEffect(Unit) {
         if (profile.otherProfile == null) {
             profile.fetchProfile(username, true)
             profile.fetchPosts(username, true)

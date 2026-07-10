@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -82,8 +84,10 @@ fun SearchScreen(
         }
     ) { innerPadding ->
         PullToRefreshBox(
-            isRefreshing = false,
-            onRefresh = {},
+            isRefreshing = search.isLoading && search.suggestions.isNotEmpty(),
+            onRefresh = {
+                search.fetchSuggestions()
+            },
             modifier = Modifier.fillMaxSize()
         ) {
             LazyVerticalGrid(
@@ -123,60 +127,50 @@ fun SearchScreen(
                     }
                 } else {
                     items(userList, key = { it.profile.id }) { user ->
-                        UserCard(
-                            user = user,
+                        ElevatedCard(
                             onClick = {
                                 if (user.profile.username == "") {
                                     onSelectTab(TabItem.Profile)
                                 } else {
                                     onNavigateToOtherProfile(user.profile.username)
                                 }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = CardDefaults.elevatedCardColors(
+                                containerColor = Color.White
+                            ),
+                            elevation = CardDefaults.elevatedCardElevation()
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
+                            ) {
+                                AsyncImage(
+                                    model = ApiConfig.current.baseURL + user.profile.profilePhoto,
+                                    contentDescription = "${user.profile.name}'s profile photo",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .aspectRatio(1f)
+                                )
+
+                                Text(
+                                    text = user.profile.name,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+
+                                CloutCapsule(user.area ?: user.targetAudience ?: "Creator")
+
+                                Spacer(modifier = Modifier.height(5.dp))
                             }
-                        )
+                        }
                     }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun UserCard(
-    user: UserContainer,
-    onClick: () -> Unit
-) {
-    val baseUrl = ApiConfig.current.baseURL
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(elevation = 6.dp, shape = RoundedCornerShape(20.dp))
-            .clip(RoundedCornerShape(20.dp))
-            .background(Color.White)
-            .clickable { onClick() },
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        AsyncImage(
-            model = baseUrl + user.profile.profilePhoto,
-            contentDescription = "${user.profile.name}'s profile photo",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-        )
-
-        Text(
-            text = user.profile.name,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-
-        CloutCapsule(user.area ?: user.targetAudience ?: "Creator")
-
-        Spacer(modifier = Modifier.height(5.dp))
     }
 }
