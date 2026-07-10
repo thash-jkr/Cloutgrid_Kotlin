@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -57,6 +58,8 @@ fun CreateScreen(
     var rawImageURI by remember { mutableStateOf<Uri?>(null) }
     var showEditImage by remember { mutableStateOf(false) }
     var selectedImage by remember { mutableStateOf<Uri?>(null) }
+
+    val context = LocalContext.current
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -200,7 +203,7 @@ fun CreateScreen(
                         showEditImage = false
                         if (bitmap != null) {
                             selectedImage = bitmapToUri(
-                                create.context,
+                                context,
                                 bitmap
                             )
                             onNavigateToCreatePost(selectedImage!!)

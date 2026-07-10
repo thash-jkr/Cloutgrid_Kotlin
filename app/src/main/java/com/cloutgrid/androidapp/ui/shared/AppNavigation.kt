@@ -16,6 +16,8 @@ import com.cloutgrid.androidapp.ui.screens.profile.Security
 import com.cloutgrid.androidapp.ui.screens.profile.PostDetail
 import kotlinx.serialization.Serializable
 import androidx.core.net.toUri
+import com.cloutgrid.androidapp.data.model.QuestionModel
+import com.cloutgrid.androidapp.ui.screens.collab.Questions
 
 @Serializable object TabNavigator
 @Serializable object ChatScreen
@@ -32,6 +34,9 @@ import androidx.core.net.toUri
 )
 @Serializable data class CreatePostRoute(
     val selectedImage: String
+)
+@Serializable data class QuestionsRoute(
+    val id: Int
 )
 
 @Composable
@@ -71,6 +76,11 @@ fun AppNavigation() {
                         CreatePostRoute(
                             selectedImage.toString()
                         )
+                    )
+                },
+                onNavigateToQuestions = { id: Int ->
+                    navController.navigate(
+                        QuestionsRoute(id)
                     )
                 }
             )
@@ -133,6 +143,15 @@ fun AppNavigation() {
 
             CreatePost(
                 selectedImage = args.selectedImage.toUri(),
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<QuestionsRoute> { backStackEntry ->
+            val args = backStackEntry.toRoute<QuestionsRoute>()
+
+            Questions(
+                id = args.id,
                 onNavigateBack = { navController.popBackStack() }
             )
         }

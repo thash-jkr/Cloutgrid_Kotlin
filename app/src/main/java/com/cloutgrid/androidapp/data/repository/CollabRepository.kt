@@ -1,5 +1,6 @@
 package com.cloutgrid.androidapp.data.repository
 
+import androidx.compose.runtime.mutableStateListOf
 import com.cloutgrid.androidapp.data.model.ApplicationModel
 import com.cloutgrid.androidapp.data.model.JobModel
 import com.cloutgrid.androidapp.data.network.APIService
@@ -11,28 +12,40 @@ import javax.inject.Singleton
 class CollabRepository @Inject constructor(
     private val apiService: APIService
 ) {
-    suspend fun fetchJobs(): List<JobModel> {
-        return apiService.request(
+    val jobs = mutableStateListOf<JobModel>()
+    val applications = mutableStateListOf<ApplicationModel>()
+
+    suspend fun fetchJobs() {
+        val response: List<JobModel> = apiService.request(
             endpoint = "/jobs/",
             method = "GET",
             requireAuth = true
         )
+
+        jobs.clear()
+        jobs.addAll(response)
     }
 
-    suspend fun fetchBusinessJobs(): List<JobModel> {
-        return apiService.request(
+    suspend fun fetchBusinessJobs() {
+        val response: List<JobModel> = apiService.request(
             endpoint = "/jobs/my-jobs/",
             method = "GET",
             requireAuth = true
         )
+
+        jobs.clear()
+        jobs.addAll(response)
     }
 
-    suspend fun fetchApplications(jobId: Int): List<ApplicationModel> {
-        return apiService.request(
+    suspend fun fetchApplications(jobId: Int) {
+        val response: List<ApplicationModel> = apiService.request(
             endpoint = "/jobs/my-jobs/$jobId/",
             method = "GET",
             requireAuth = true
         )
+
+        applications.clear()
+        applications.addAll(response)
     }
 
     suspend fun createJob(

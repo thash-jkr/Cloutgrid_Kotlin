@@ -119,6 +119,8 @@ fun CloutHeader(
                 colors = if (title in listOf(
                     "Notifications",
                     "Comments",
+                    "Questions",
+                    "Answers"
                 )) {
                     listOf(
                         Color.White.copy(alpha = 1f),

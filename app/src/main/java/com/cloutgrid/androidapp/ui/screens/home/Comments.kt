@@ -89,6 +89,7 @@ fun Comments(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color.White)
+                            .padding(top = innerPadding.calculateTopPadding())
                     ) {
                         Empty(
                             type = "comment",
@@ -270,7 +271,7 @@ private fun CommentInputBar(
                     }
                     innerTextField()
                 }
-            }
+            },
         )
 
         Spacer(modifier = Modifier.width(4.dp))

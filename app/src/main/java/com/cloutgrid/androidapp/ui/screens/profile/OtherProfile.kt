@@ -57,6 +57,7 @@ fun OtherProfile(
     LaunchedEffect(username) {
         if (profile.otherProfile == null) {
             profile.fetchProfile(username, true)
+            profile.fetchPosts(username, true)
         }
     }
 
@@ -67,9 +68,7 @@ fun OtherProfile(
     var showUnfollowDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(otherProfile) {
-        profile.fetchPosts(username, true)
-
-        if (otherProfile?.profile?.userType == "business") {
+        if (profile.otherCollabs.isEmpty() && otherProfile?.profile?.userType == "business") {
             profile.fetchCollabs(username, true)
         }
     }
@@ -140,13 +139,20 @@ fun OtherProfile(
         }
     ) { innerPadding ->
         PullToRefreshBox(
-            isRefreshing = false,
-            onRefresh = { },
+            isRefreshing = profile.isLoading && profile.otherProfile != null,
+            onRefresh = {
+                profile.fetchProfile(username, true)
+                profile.fetchPosts(username, true)
+                if (otherProfile?.profile?.userType == "business") {
+                    profile.fetchCollabs(username, true)
+                }
+            },
             modifier = Modifier.fillMaxSize()
         ) {
             LazyColumn(
                 contentPadding = PaddingValues(
                     top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding()
                 ),
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -173,7 +179,7 @@ fun OtherProfile(
 
                         when(selectedTab) {
                             "Posts" -> {
-                                if (profile.posts.isEmpty()) {
+                                if (profile.otherPosts.isEmpty()) {
                                     item {
                                         Empty(
                                             type = "post",
@@ -199,7 +205,7 @@ fun OtherProfile(
                                 }
                             }
                             "Collabs" -> {
-                                if (profile.posts.isEmpty()) {
+                                if (profile.otherCollabs.isEmpty()) {
                                     item {
                                         Empty(
                                             type = "post",

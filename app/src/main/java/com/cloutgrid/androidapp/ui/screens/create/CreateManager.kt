@@ -26,7 +26,6 @@ class CreateManager @Inject constructor(
     private val homeRepository: HomeRepository,
     private val createRepository: CreateRepository,
     private val profileRepository: ProfileRepository,
-    @ApplicationContext val context: Context
 ) : ViewModel() {
     val user = authRepository.user.stateIn(
         scope = viewModelScope,

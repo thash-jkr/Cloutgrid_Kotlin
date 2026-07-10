@@ -51,6 +51,7 @@ fun TabNavigator(
     onNavigateToPostDetail: (PostModel, Boolean) -> Unit,
     onNavigateToOtherProfile: (String) -> Unit,
     onNavigateToCreatePost: (Uri) -> Unit,
+    onNavigateToQuestions: (Int) -> Unit,
 ) {
     val tabs = TabItem.entries.toTypedArray()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
@@ -148,7 +149,9 @@ fun TabNavigator(
                     onNavigateToCreatePost = onNavigateToCreatePost
                 )
                 TabItem.Jobs -> CollabScreen(
-                    scaffoldPadding = paddingValues
+                    scaffoldPadding = paddingValues,
+                    onNavigateToQuestions = onNavigateToQuestions,
+                    onNavigateToOtherProfile = onNavigateToOtherProfile
                 )
                 TabItem.Profile -> ProfileScreen(
                     scaffoldPadding = paddingValues,

@@ -88,7 +88,7 @@ fun ProfileScreen(
         }
     ) { innerPadding ->
         PullToRefreshBox(
-            isRefreshing = false,
+            isRefreshing = profile.isLoading,
             onRefresh = { },
             modifier = Modifier.fillMaxSize()
         ) {

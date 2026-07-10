@@ -29,12 +29,14 @@ class CollabManager @Inject constructor(
         initialValue = null
     )
 
-    val jobs = mutableStateListOf<JobModel>()
-    val applications = mutableStateListOf<ApplicationModel>()
+    val jobs = collabRepository.jobs
+    val applications = collabRepository.applications
 
     var isLoading by mutableStateOf(false)
         private set
     var errorMessage by mutableStateOf<String?>(null)
+        private set
+    var successMessage by mutableStateOf<String?>(null)
         private set
 
     private val _events = Channel<Boolean>(Channel.BUFFERED)
@@ -46,9 +48,7 @@ class CollabManager @Inject constructor(
             errorMessage = null
 
             try {
-                val response = collabRepository.fetchJobs()
-                jobs.clear()
-                jobs.addAll(response)
+                collabRepository.fetchJobs()
             } catch (e: Exception) {
                 errorMessage = e.localizedMessage ?: "An error occurred"
             } finally {
@@ -63,9 +63,7 @@ class CollabManager @Inject constructor(
             errorMessage = null
 
             try {
-                val response = collabRepository.fetchBusinessJobs()
-                jobs.clear()
-                jobs.addAll(response)
+                collabRepository.fetchBusinessJobs()
             } catch (e: Exception) {
                 errorMessage = e.localizedMessage ?: "An error occurred"
             } finally {
@@ -80,9 +78,7 @@ class CollabManager @Inject constructor(
             errorMessage = null
 
             try {
-                val response = collabRepository.fetchApplications(job.id)
-                applications.clear()
-                applications.addAll(response)
+                collabRepository.fetchApplications(job.id)
             } catch (e: Exception) {
                 errorMessage = e.localizedMessage ?: "An error occurred"
             } finally {
@@ -149,6 +145,7 @@ class CollabManager @Inject constructor(
                     jobs[index] = jobs[index].copy(isApplied = true)
                 }
 
+                successMessage = "Application submitted"
                 _events.send(true)
             } catch (e: Exception) {
                 errorMessage = e.localizedMessage ?: "An error occurred"
