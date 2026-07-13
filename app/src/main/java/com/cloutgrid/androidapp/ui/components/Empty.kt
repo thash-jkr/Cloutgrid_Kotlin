@@ -29,6 +29,8 @@ fun Empty(
         "post" -> R.drawable.post
         "collab" -> R.drawable.collab
         "comment" -> R.drawable.comments
+        "instagram" -> R.drawable.instagram_insights
+        "youtube" -> R.drawable.youtube_analytics
         else -> R.drawable.general
     }
 

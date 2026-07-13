@@ -231,14 +231,11 @@ class ProfileManager @Inject constructor(
 
             try {
                 profileRepository.handleBlock(username, block)
-
-                Toast.makeText(
-                    context,
-                    "You have ${if (block) "blocked" else "unblocked"} @$username",
-                    Toast.LENGTH_SHORT
-                ).show()
-
                 otherProfile = otherProfile?.copy(isBlocking = block)
+
+                if (block) {
+                    homeRepository.handleBlock(username)
+                }
             } catch (e: Exception) {
                 errorMessage = e.localizedMessage ?: "An error occurred"
             } finally {
@@ -263,6 +260,19 @@ class ProfileManager @Inject constructor(
                 }
             } catch (e: Exception) {
                 errorMessage = e.localizedMessage ?: "An error occurred"
+            }
+        }
+    }
+
+    fun handleDeletePost(postID: Int) {
+        viewModelScope.launch {
+            errorMessage = null
+
+            try {
+                homeRepository.deletePost(postID)
+                profileRepository.handlePostDelete(postID)
+            } catch (e: Exception) {
+                errorMessage = e.localizedMessage
             }
         }
     }

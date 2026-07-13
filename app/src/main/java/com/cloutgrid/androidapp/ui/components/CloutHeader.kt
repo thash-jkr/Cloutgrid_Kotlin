@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.cloutgrid.androidapp.data.model.HeaderAction
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.DpOffset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +84,8 @@ fun CloutHeader(
                             expanded = menuExpanded,
                             onDismissRequest = { menuExpanded = false },
                             modifier = Modifier
-                                .background(Color.White)
+                                .background(Color.White),
+                            offset = DpOffset(0.dp, (5).dp)
                         ) {
                             action.menuItems.forEachIndexed { idx, menuItem ->
                                 DropdownMenuItem(

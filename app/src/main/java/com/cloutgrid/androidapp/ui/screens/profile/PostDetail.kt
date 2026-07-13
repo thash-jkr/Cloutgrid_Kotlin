@@ -1,8 +1,6 @@
 package com.cloutgrid.androidapp.ui.screens.profile
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -69,15 +67,24 @@ fun PostDetail(
             ) {
                 if (post != null) {
                     FeedPost(
-                        post,
-                        {
-                            profile.likePost(id)
+                        post = post,
+                        onLikeClick = { profile.likePost(id) },
+                        onCommentClick = { showCommentsSheet = true },
+                        onUserClick = {},
+                        modifier = Modifier,
+                        isOwner = !other,
+                        onBlockClick = {
+                            if (other) {
+                                profile.handleBlock(post.postedBy.profile.username, true)
+                                onNavigateBack()
+                            }
                         },
-                        {
-                            profile.fetchComments(id)
-                            showCommentsSheet = true
-                        },
-                        {},
+                        onDeleteClick = {
+                            if (!other) {
+                                profile.handleDeletePost(post.id)
+                                onNavigateBack()
+                            }
+                        }
                     )
                 }
             }

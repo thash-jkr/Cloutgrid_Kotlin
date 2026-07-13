@@ -7,8 +7,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +14,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -96,94 +96,88 @@ fun CreateScreen(
             Column(
                 modifier = Modifier.padding(top = innerPadding.calculateTopPadding())
             ) {
-                Row(
+                ElevatedCard(
+                    onClick = {
+                        photoPickerLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    },
                     modifier = Modifier
                         .padding(16.dp, 10.dp)
-                        .shadow(
-                            elevation = 8.dp,
-                            shape = RoundedCornerShape(20.dp),
-                            clip = false
-                        )
-                        .background(
-                            color = Color.White,
-                            shape = RoundedCornerShape(20.dp)
-                        )
-                        .clickable {
-                            photoPickerLauncher.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                            )
-                        }
                         .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    ),
+                    shape = RoundedCornerShape(20.dp),
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .weight(1f)
-                    ) {
-                        Text(
-                            "Post",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Text("Upload an image from a previous brand collaboration or campaign you've been part of")
-                    }
-
-                    Image(
-                        painter = painterResource(id = R.drawable.create),
-                        contentDescription = "Create Post",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .width(150.dp)
-                    )
-                }
-
-                if (!isCreator) {
                     Row(
-                        modifier = Modifier
-                            .padding(16.dp, 10.dp)
-                            .shadow(
-                                elevation = 8.dp,
-                                shape = RoundedCornerShape(20.dp),
-                                clip = false
-                            )
-                            .background(
-                                color = Color.White,
-                                shape = RoundedCornerShape(20.dp)
-                            )
-                            .clickable {
-
-                            }
-                            .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .weight(1f)
+                        ) {
+                            Text(
+                                "Post",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Text("Upload an image from a previous brand collaboration or campaign you've been part of")
+                        }
+
                         Image(
-                            painter = painterResource(id = R.drawable.collab_2),
-                            contentDescription = "Create Collaboration",
+                            painter = painterResource(id = R.drawable.create),
+                            contentDescription = "Create Post",
                             contentScale = ContentScale.Fit,
                             modifier = Modifier
                                 .padding(10.dp)
                                 .width(150.dp)
                         )
+                    }
+                }
 
-                        Column(
-                            modifier = Modifier
-                                .padding(10.dp)
-                                .weight(1f),
-                            horizontalAlignment = Alignment.End
+                if (!isCreator) {
+                    ElevatedCard(
+                        onClick = {},
+                        modifier = Modifier
+                            .padding(16.dp, 10.dp)
+                            .fillMaxWidth(),
+                        colors = CardDefaults.elevatedCardColors(
+                            containerColor = MaterialTheme.colorScheme.background
+                        ),
+                        shape = RoundedCornerShape(20.dp),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                "Collaboration",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold
+                            Image(
+                                painter = painterResource(id = R.drawable.collab_2),
+                                contentDescription = "Create Collaboration",
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .width(150.dp)
                             )
 
-                            Text(
-                                "Post a collaboration opportunity to connect with creators who match your brand",
-                                textAlign = TextAlign.End
-                            )
+                            Column(
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .weight(1f),
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                Text(
+                                    "Collaboration",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+
+                                Text(
+                                    "Post a collaboration opportunity to connect with creators who match your brand",
+                                    textAlign = TextAlign.End
+                                )
+                            }
                         }
                     }
                 }

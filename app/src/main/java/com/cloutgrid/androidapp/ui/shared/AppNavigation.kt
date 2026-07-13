@@ -17,6 +17,7 @@ import com.cloutgrid.androidapp.ui.screens.profile.PostDetail
 import kotlinx.serialization.Serializable
 import androidx.core.net.toUri
 import com.cloutgrid.androidapp.data.model.QuestionModel
+import com.cloutgrid.androidapp.ui.components.TestScreen
 import com.cloutgrid.androidapp.ui.screens.collab.Questions
 
 @Serializable object TabNavigator
@@ -87,7 +88,7 @@ fun AppNavigation() {
         }
 
         composable<ChatScreen> {
-            ChatScreen()
+            TestScreen()
         }
 
         composable<Settings> {

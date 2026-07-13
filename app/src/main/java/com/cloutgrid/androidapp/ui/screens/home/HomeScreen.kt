@@ -1,5 +1,6 @@
 package com.cloutgrid.androidapp.ui.screens.home
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,7 +9,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.rounded.ChatBubbleOutline
+import androidx.compose.material.icons.rounded.NotificationsNone
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -20,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -29,11 +35,10 @@ import com.cloutgrid.androidapp.R
 import com.cloutgrid.androidapp.data.model.HeaderAction
 import com.cloutgrid.androidapp.ui.components.CloutHeader
 import com.cloutgrid.androidapp.ui.components.CloutSheet
-import com.cloutgrid.androidapp.ui.components.LoadingSpinner
 import com.cloutgrid.androidapp.ui.shared.TabItem
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun HomeScreen(
     home: HomeManager = hiltViewModel(),
@@ -92,12 +97,12 @@ fun HomeScreen(
                 ),
                 actions = listOf(
                     HeaderAction(
-                        icon = Icons.Default.Notifications,
+                        icon = Icons.Rounded.NotificationsNone,
                         contentDescription = "Notifications",
                         onClick = { showNotificationSheet = true }
                     ),
                     HeaderAction(
-                        icon = Icons.Outlined.ChatBubbleOutline,
+                        icon = Icons.Rounded.ChatBubbleOutline,
                         contentDescription = "Direct Messages",
                         onClick = { onNavigateToChatScreen() }
                     )
@@ -147,13 +152,28 @@ fun HomeScreen(
                                     onNavigateToOtherProfile(username)
                                 }
                             }
+                        },
+                        onBlockClick = {
+                            home.handleBlock(
+                                post.postedBy.profile.username,
+                                true
+                            )
+                        },
+                        isOwner = post.postedBy.profile.username == user?.profile?.username,
+                        onDeleteClick = {
+                            home.deletePost(post.id)
                         }
                     )
                 }
 
                 if (home.posts.isNotEmpty() && home.isLoading) {
                     item {
-                        LoadingSpinner()
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            LoadingIndicator()
+                        }
                     }
                 }
             }

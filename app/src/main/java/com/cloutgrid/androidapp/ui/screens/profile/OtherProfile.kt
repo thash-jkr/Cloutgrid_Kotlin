@@ -44,6 +44,8 @@ import com.cloutgrid.androidapp.ui.components.CloutHeader
 import com.cloutgrid.androidapp.ui.components.Empty
 import com.cloutgrid.androidapp.ui.components.ReportBox
 import com.cloutgrid.androidapp.ui.screens.integration.InstagramConstants
+import com.cloutgrid.androidapp.ui.screens.integration.OtherInstagram
+import com.cloutgrid.androidapp.ui.screens.integration.OtherYouTube
 import com.cloutgrid.androidapp.ui.screens.integration.YoutubeConstants
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -196,12 +198,16 @@ fun OtherProfile(
                             }
                             "Instagram" -> {
                                 item {
-                                    InstagramConstants()
+                                    OtherInstagram(
+                                        user = otherProfile
+                                    )
                                 }
                             }
                             "YouTube" -> {
                                 item {
-                                    YoutubeConstants()
+                                    OtherYouTube(
+                                        user = otherProfile
+                                    )
                                 }
                             }
                             "Collabs" -> {

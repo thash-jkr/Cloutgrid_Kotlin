@@ -10,8 +10,10 @@ import androidx.lifecycle.viewModelScope
 import com.cloutgrid.androidapp.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,7 +21,6 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthManager @Inject constructor(
     private val authRepository: AuthRepository,
-    @ApplicationContext private val context: Context
 ) : ViewModel() {
     val isAuth: StateFlow<Boolean> = authRepository.isAuth.stateIn(
         scope = viewModelScope,
@@ -33,6 +34,9 @@ class AuthManager @Inject constructor(
         initialValue = null
     )
 
+    private val _events = Channel<Boolean>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
+
     var isLoading by mutableStateOf(false)
         private set
 
@@ -45,9 +49,10 @@ class AuthManager @Inject constructor(
             errorMessage = null
             try {
                 authRepository.login(email, password, type)
+                _events.send(true)
             } catch (e: Exception) {
                 errorMessage = e.localizedMessage ?: "An error occurred during authentication"
-                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                _events.send(false)
             } finally {
                 isLoading = false
             }

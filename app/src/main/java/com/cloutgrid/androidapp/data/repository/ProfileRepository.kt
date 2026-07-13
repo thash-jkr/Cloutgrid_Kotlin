@@ -94,4 +94,8 @@ class ProfileRepository @Inject constructor(
             requireAuth = true
         )
     }
+
+    fun handlePostDelete(postID: Int) {
+        posts.removeAll { it.id == postID }
+    }
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cloutgrid.androidapp.ui.theme.First
+import com.cloutgrid.androidapp.ui.theme.OffWhite
 import com.cloutgrid.androidapp.ui.theme.Second
 
 @Composable
@@ -113,7 +114,7 @@ fun HomeSelectionCard(
             .size(width = 300.dp, height = 200.dp)
             .clickable { onClick() },
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = OffWhite
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {

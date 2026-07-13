@@ -34,6 +34,7 @@ import com.cloutgrid.androidapp.data.network.ApiConfig
 import com.cloutgrid.androidapp.ui.components.CloutHeader
 import com.cloutgrid.androidapp.ui.components.Empty
 import com.cloutgrid.androidapp.ui.components.ReportBox
+import com.cloutgrid.androidapp.ui.theme.OffWhite
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -229,8 +230,12 @@ private fun CommentInputBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = 6.dp, shape = RoundedCornerShape(28.dp))
-            .background(Color.White, shape = RoundedCornerShape(28.dp))
+            .shadow(
+                elevation = 2.dp,
+                shape = CircleShape,
+                clip = true
+            )
+            .background(OffWhite, shape = RoundedCornerShape(28.dp))
             .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

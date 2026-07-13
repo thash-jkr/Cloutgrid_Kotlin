@@ -4,6 +4,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import com.cloutgrid.androidapp.data.model.*
 import com.cloutgrid.androidapp.data.network.APIService
 import javax.inject.Inject
@@ -76,6 +78,7 @@ class HomeRepository @Inject constructor(
             method = "DELETE",
             requireAuth = true
         )
+
         posts.removeAll { it.id == postID }
     }
 
@@ -102,5 +105,9 @@ class HomeRepository @Inject constructor(
             method = "DELETE",
             requireAuth = true
         )
+    }
+
+    fun handleBlock(username: String) {
+        posts.removeAll { it.postedBy.profile.username == username }
     }
 }

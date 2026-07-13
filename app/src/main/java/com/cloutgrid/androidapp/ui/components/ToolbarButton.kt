@@ -2,6 +2,8 @@ package com.cloutgrid.androidapp.ui.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -12,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -24,13 +27,13 @@ fun ToolbarButton(
         onClick = onClick,
         modifier = Modifier
             .shadow(
-                elevation = 6.dp,
+                elevation = 2.dp,
                 shape = CircleShape,
-                clip = false
+                clip = true
             )
             .size(45.dp),
         colors = IconButtonDefaults.filledTonalIconButtonColors(
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.background,
             contentColor = MaterialTheme.colorScheme.onSurface
         )
     ) {
@@ -45,4 +48,14 @@ fun ToolbarButton(
             }
         )
     }
+}
+
+@Preview
+@Composable
+fun ToolbarButtonPreview() {
+    ToolbarButton(
+        imageVector = Icons.Rounded.Home,
+        contentDescription = "Icon",
+        onClick = {}
+    )
 }

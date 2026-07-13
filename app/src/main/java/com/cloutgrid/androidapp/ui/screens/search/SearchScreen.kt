@@ -138,7 +138,7 @@ fun SearchScreen(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(20.dp),
                             colors = CardDefaults.elevatedCardColors(
-                                containerColor = Color.White
+                                containerColor = MaterialTheme.colorScheme.background
                             ),
                             elevation = CardDefaults.elevatedCardElevation()
                         ) {

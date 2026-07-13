@@ -16,6 +16,7 @@ import androidx.lifecycle.viewModelScope
 import com.cloutgrid.androidapp.data.model.CommentModel
 import com.cloutgrid.androidapp.data.model.PostModel
 import com.cloutgrid.androidapp.data.repository.HomeRepository
+import com.cloutgrid.androidapp.data.repository.ProfileRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
 
@@ -23,6 +24,7 @@ import kotlinx.coroutines.launch
 class HomeManager @Inject constructor(
     authRepository: AuthRepository,
     private val homeRepository: HomeRepository,
+    private val profileRepository: ProfileRepository
 ) : ViewModel() {
     val user = authRepository.user.stateIn(
         scope = viewModelScope,
@@ -105,8 +107,10 @@ class HomeManager @Inject constructor(
     fun deletePost(postID: Int) {
         viewModelScope.launch {
             errorMessage = null
+
             try {
                 homeRepository.deletePost(postID)
+                profileRepository.handlePostDelete(postID)
             } catch (e: Exception) {
                 errorMessage = e.localizedMessage
             }
@@ -162,6 +166,25 @@ class HomeManager @Inject constructor(
                 }
             } catch (e: Exception) {
                 errorMessage = e.localizedMessage
+            }
+        }
+    }
+
+    fun handleBlock(username: String, block: Boolean) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = null
+
+            try {
+                profileRepository.handleBlock(username, block)
+
+                if (block) {
+                    homeRepository.handleBlock(username)
+                }
+            } catch (e: Exception) {
+            errorMessage = e.localizedMessage
+            } finally {
+                isLoading = false
             }
         }
     }

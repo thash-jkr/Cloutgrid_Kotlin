@@ -1,5 +1,7 @@
 package com.cloutgrid.androidapp.ui.screens.auth
 
+import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -12,15 +14,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,13 +36,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.cloutgrid.androidapp.data.model.HeaderAction
+import com.cloutgrid.androidapp.ui.components.CloutHeader
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LoginScreen(
     onNavigateBack: () -> Unit,
@@ -43,30 +54,35 @@ fun LoginScreen(
     var type by remember { mutableStateOf("Creator") }
     val isCreator = type == "Creator"
 
-    var emailState = rememberTextFieldState()
-    var passwordState = rememberTextFieldState()
+    val context = LocalContext.current
+
+    val emailState = rememberTextFieldState()
+    val passwordState = rememberTextFieldState()
+
+    LaunchedEffect(Unit) {
+        authManager.events.collect { success ->
+            if (!success) {
+                Toast.makeText(context, authManager.errorMessage, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(text = "$type Login", fontWeight = FontWeight.Bold)
-                },
-                navigationIcon = {
-                    IconButton(onClick = { onNavigateBack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Navigate Back"
-                        )
-                    }
-                },
-
+            CloutHeader(
+                title = "$type Login",
+                icon = HeaderAction(
+                    icon = Icons.AutoMirrored.Rounded.ArrowBack,
+                    contentDescription = "Back",
+                    onClick = { onNavigateBack() }
+                )
             )
         }
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .padding(innerPadding),
             contentAlignment = Alignment.TopCenter
         ) {
@@ -82,7 +98,7 @@ fun LoginScreen(
                         .padding(all=10.dp)
                 )
 
-                OutlinedTextField(
+                OutlinedSecureTextField(
                     state = passwordState,
                     label = { Text("Password") },
                     modifier = Modifier
@@ -95,15 +111,25 @@ fun LoginScreen(
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Button({
-                        val email = emailState.text.toString().trim()
-                        val password = passwordState.text.toString().trim()
+                    if (authManager.isLoading) {
+                        LoadingIndicator()
+                    } else {
+                        Button({
+                            val email = emailState.text.toString().trim()
+                            val password = passwordState.text.toString().trim()
 
-                        if (email.isNotEmpty() && password.isNotEmpty()) {
-                            authManager.login(email, password, type.lowercase())
+                            if (email.isNotEmpty() && password.isNotEmpty()) {
+                                authManager.login(email, password, type.lowercase())
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Please fill in all fields",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }) {
+                            Text("Submit")
                         }
-                    }) {
-                        Text("Submit")
                     }
                 }
 
@@ -111,7 +137,9 @@ fun LoginScreen(
                     LoginFooter(
                         question = "Don't have an account?",
                         answer = "Register",
-                        onClick = {}
+                        onClick = {
+                            onNavigateBack()
+                        }
                     )
 
                     LoginFooter(
@@ -160,10 +188,4 @@ fun LoginFooter(question: String, answer: String, onClick: () -> Unit) {
                 .padding(top = 10.dp)
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-   LoginScreen({})
 }

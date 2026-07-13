@@ -15,6 +15,11 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Work
+import androidx.compose.material.icons.rounded.AddCircle
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Work
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -32,15 +37,16 @@ import com.cloutgrid.androidapp.ui.screens.home.HomeScreen
 import com.cloutgrid.androidapp.ui.screens.profile.ProfileScreen
 import com.cloutgrid.androidapp.ui.screens.search.SearchScreen
 import com.cloutgrid.androidapp.ui.theme.First
+import com.cloutgrid.androidapp.ui.theme.OffWhite
 import com.cloutgrid.androidapp.ui.theme.Second
 import kotlinx.coroutines.launch
 
 enum class TabItem(val title: String, val icon: ImageVector) {
-    Home("Home", Icons.Default.Home),
-    Search("Search", Icons.Default.Search),
-    Create("Create", Icons.Default.AddCircle),
-    Jobs("Jobs", Icons.Default.Work),
-    Profile("Profile", Icons.Default.Person)
+    Home("Home", Icons.Rounded.Home),
+    Search("Search", Icons.Rounded.Search),
+    Create("Create", Icons.Rounded.AddCircle),
+    Jobs("Jobs", Icons.Rounded.Work),
+    Profile("Profile", Icons.Rounded.Person)
 }
 
 @Composable
@@ -69,15 +75,16 @@ fun TabNavigator(
             Surface(
                 modifier = Modifier
                     .navigationBarsPadding()
-                    .padding(horizontal = 20.dp, vertical = 12.dp)
-                    .height(70.dp)
-                    .fillMaxWidth(),
+                    .padding(vertical = 15.dp, horizontal = 15.dp)
+                    .height(70.dp),
                 shape = CircleShape,
-                color = Color.White.copy(alpha = 0.92f),
-                tonalElevation = 8.dp
+                color = OffWhite,
+                shadowElevation = 1.dp
             ) {
                 Row(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -86,7 +93,6 @@ fun TabNavigator(
 
                         Box(
                             modifier = Modifier
-                                .weight(1f)
                                 .fillMaxHeight()
                                 .clickable(
                                     interactionSource = remember { MutableInteractionSource() },
@@ -116,8 +122,7 @@ fun TabNavigator(
                                         imageVector = tab.icon,
                                         contentDescription = tab.title,
                                         modifier = Modifier.size(25.dp),
-                                        tint = if (isSelected) Color.White
-                                        else First
+                                        tint = if (isSelected) Color.White else First
                                     )
                                 }
                             }

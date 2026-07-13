@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.cloutgrid.androidapp.ui.theme.First
 import com.cloutgrid.androidapp.ui.theme.Second
 import com.cloutgrid.androidapp.R
+import com.cloutgrid.androidapp.ui.theme.OffWhite
 
 @Composable
 fun ProfileSelector(
@@ -35,13 +37,18 @@ fun ProfileSelector(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 12.dp),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Row(
             modifier = Modifier
-                .background(color = First, shape = CircleShape)
+                .shadow(
+                    elevation = 2.dp,
+                    shape = CircleShape,
+                    clip = false
+                )
+                .background(color = OffWhite, shape = CircleShape)
                 .padding(horizontal = 6.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(50.dp),
+            horizontalArrangement = Arrangement.spacedBy(25.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             tabs.forEach { title ->
@@ -61,7 +68,7 @@ fun ProfileSelector(
                                 imageVector = Icons.Filled.Grid3x3,
                                 contentDescription = "Post",
                                 modifier = Modifier.size(25.dp),
-                                tint = Color.White
+                                tint = if (isSelected) Color.White else First
                             )
                         }
                         "Collabs" -> {
@@ -69,14 +76,14 @@ fun ProfileSelector(
                                 imageVector = Icons.Filled.Handshake,
                                 contentDescription = "Collab",
                                 modifier = Modifier.size(25.dp),
-                                tint = Color.White
+                                tint = if (isSelected) Color.White else First
                             )
                         }
                         "Instagram" -> {
                             Icon(
                                 painter = painterResource(id = R.drawable.instagram),
                                 contentDescription = "Instagram",
-                                tint = Color.White,
+                                tint = if (isSelected) Color.White else First,
                                 modifier = Modifier.size(25.dp)
                             )
                         }
@@ -84,7 +91,7 @@ fun ProfileSelector(
                             Icon(
                                 painter = painterResource(id = R.drawable.youtube),
                                 contentDescription = "YouTube",
-                                tint = Color.White,
+                                tint = if (isSelected) Color.White else First,
                                 modifier = Modifier.size(25.dp)
                             )
                         }

@@ -8,6 +8,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -135,15 +137,21 @@ fun NotificationDismissRow(
                     .clip(shape)
             ) {
                 ListItem(
-                    headlineContent = {
+                    modifier = Modifier,
+                    leadingContent = null,
+                    trailingContent = null,
+                    overlineContent = null,
+                    supportingContent = null,
+                    colors = ListItemDefaults.colors(
+                        containerColor = OffWhite
+                    ),
+                    elevation = ListItemDefaults.elevation(ListItemDefaults.Elevation),
+                    content = {
                         Text(
                             text = item.message,
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
-                    colors = ListItemDefaults.colors(
-                        containerColor = OffWhite
-                    )
                 )
 
                 if (showDivider) {
