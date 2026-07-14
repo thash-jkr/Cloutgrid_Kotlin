@@ -2,13 +2,14 @@ package com.cloutgrid.androidapp.data.repository
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.cloutgrid.androidapp.data.model.EmptyResponse
 import com.cloutgrid.androidapp.data.model.LoginResponse
 import com.cloutgrid.androidapp.data.model.UserContainer
 import com.cloutgrid.androidapp.data.network.APIService
-import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +27,7 @@ private val Context.authDataStore: DataStore<Preferences> by preferencesDataStor
 @Singleton
 class AuthRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val apiService: Lazy<APIService>
+    private val apiService: APIService
 ) {
     private val dataStore = context.authDataStore
     private val json = Json { ignoreUnknownKeys = true }
@@ -60,7 +61,7 @@ class AuthRepository @Inject constructor(
     ) {
         val endpoint = "/profile/${userType}/"
 
-        val updatedUser: UserContainer = apiService.get().multipartRequest(
+        val updatedUser: UserContainer = apiService.multipartRequest(
             endpoint = endpoint,
             method = "PUT",
             imageBytes = imageBytes,
@@ -85,7 +86,7 @@ class AuthRepository @Inject constructor(
     }
 
     suspend fun login(email: String, password: String, userType: String) {
-        val response: LoginResponse = apiService.get().request(
+        val response: LoginResponse = apiService.request(
             endpoint = "/login/$userType/",
             method = "POST",
             body = mapOf("email" to email, "password" to password),
@@ -98,7 +99,7 @@ class AuthRepository @Inject constructor(
     suspend fun logout() {
         val refreshToken = refresh.first() ?: ""
         try {
-            apiService.get().request<EmptyResponse>(
+            apiService.request<EmptyResponse>(
                 endpoint = "/logout/",
                 method = "POST",
                 body = mapOf("refresh" to refreshToken),
@@ -132,5 +133,44 @@ class AuthRepository @Inject constructor(
             prefs[PreferencesKeys.ACCESS_TOKEN] = accessToken
             prefs[PreferencesKeys.REFRESH_TOKEN] = refreshToken
         }
+    }
+
+    suspend fun register(
+        data: Map<String, String>,
+        type: String,
+    ) {
+        apiService.multipartRequest<Unit>(
+            endpoint = "/register/$type/",
+            method = "POST",
+            imageBytes = null,
+            imageKey = null,
+            params = data,
+            requireAuth = false
+        )
+    }
+
+    suspend fun handleOTP(
+        data: Map<String, String>,
+        type: String
+    ) {
+        apiService.multipartRequest<Unit>(
+            endpoint = "/otp/$type/",
+            method = "POST",
+            imageBytes = null,
+            imageKey = null,
+            params = data,
+            requireAuth = false
+        )
+    }
+
+    suspend fun resetPassword(
+        email: String
+    ) {
+        apiService.request<EmptyResponse>(
+            endpoint = "/password-reset/",
+            method = "POST",
+            body = mapOf("email" to email),
+            requireAuth = false
+        )
     }
 }

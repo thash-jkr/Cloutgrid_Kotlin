@@ -21,11 +21,14 @@ import kotlinx.serialization.json.jsonPrimitive
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
+import dagger.Lazy
 
 @Singleton
 class APIService @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: Lazy<AuthRepository>
 ) {
+    private val authRepo get() = authRepository.get()
+
     val baseURL = ApiConfig.current.baseURL
 
     val client = HttpClient(OkHttp) {
@@ -41,8 +44,8 @@ class APIService @Inject constructor(
             bearer {
                 loadTokens {
                     // Asynchronously pull current snapshots from DataStore
-                    val access = authRepository.access.first()
-                    val refresh = authRepository.refresh.first()
+                    val access = authRepo.access.first()
+                    val refresh = authRepo.refresh.first()
 
                     if (!access.isNullOrEmpty() && !refresh.isNullOrEmpty()) {
                         BearerTokens(access, refresh)
@@ -50,7 +53,7 @@ class APIService @Inject constructor(
                 }
 
                 refreshTokens {
-                    val refreshToken = authRepository.refresh.first() ?: return@refreshTokens null
+                    val refreshToken = authRepo.refresh.first() ?: return@refreshTokens null
                     try {
                         // Request a fresh pair of tokens from your Django backend
                         val response = client.post("$baseURL/token/refresh/") {
@@ -64,11 +67,11 @@ class APIService @Inject constructor(
                             val newAccess = body["access"] ?: ""
                             val newRefresh = body["refresh"] ?: refreshToken
 
-                            authRepository.updateTokens(newAccess, newRefresh)
+                            authRepo.updateTokens(newAccess, newRefresh)
 
                             BearerTokens(newAccess, newRefresh)
                         } else {
-                            authRepository.clearSession()
+                            authRepo.clearSession()
                             null
                         }
                     } catch (e: Exception) {
