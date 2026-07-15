@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cloutgrid.androidapp.data.model.UserContainer
 import com.cloutgrid.androidapp.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -22,17 +23,9 @@ class AuthManager @Inject constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
     lateinit var selectedType: String
-    val isAuth: StateFlow<Boolean> = authRepository.isAuth.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = false
-    )
 
-    val user = authRepository.user.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
-    )
+    val isAuth: StateFlow<Boolean?> = authRepository.isAuth
+    val user: StateFlow<UserContainer?> = authRepository.user
 
     var name = TextFieldState()
     var username = TextFieldState()

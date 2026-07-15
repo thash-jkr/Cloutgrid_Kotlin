@@ -43,6 +43,7 @@ fun Settings(
 ) {
     var showHelpDialog by remember { mutableStateOf(false) }
     var showFeedbackDialog by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -163,7 +164,7 @@ fun Settings(
                     ListRow(
                         title = "Logout",
                         icon = Icons.AutoMirrored.Outlined.Logout,
-                        onClick = { profile.logout() },
+                        onClick = { showLogoutDialog = true },
                         danger = true
                     )
                 }
@@ -188,6 +189,31 @@ fun Settings(
                 onDismiss = { showFeedbackDialog = false },
                 onSubmit = {
                     showFeedbackDialog = false
+                }
+            )
+        }
+
+        if (showLogoutDialog) {
+            AlertDialog(
+                onDismissRequest = { showLogoutDialog = false },
+                title = { Text("Logout") },
+                text = { Text("Are you sure you want to logout?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showLogoutDialog = false
+                            profile.logout()
+                        }
+                    ) {
+                        Text("Logout")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showLogoutDialog = false }
+                    ) {
+                        Text("Cancel")
+                    }
                 }
             )
         }

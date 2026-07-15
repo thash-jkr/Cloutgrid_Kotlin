@@ -2,6 +2,7 @@ package com.cloutgrid.androidapp.data.repository
 
 import androidx.compose.runtime.mutableStateListOf
 import com.cloutgrid.androidapp.data.model.ApplicationModel
+import com.cloutgrid.androidapp.data.model.EmptyResponse
 import com.cloutgrid.androidapp.data.model.JobModel
 import com.cloutgrid.androidapp.data.network.APIService
 import kotlinx.serialization.json.Json
@@ -74,17 +75,20 @@ class CollabRepository @Inject constructor(
     }
 
     suspend fun deleteJob(id: Int) {
-        apiService.request<Unit>(
+        apiService.request<EmptyResponse>(
             endpoint = "/jobs/$id/",
             method = "DELETE",
             requireAuth = true
         )
+
+        jobs.removeAll { it.id == id }
+        applications.clear()
     }
 
     suspend fun submitApplication(id: Int, answers: Map<Int, String>) {
         val stringKeyedAnswers = answers.mapKeys { it.key.toString() }
 
-        apiService.request<Unit>(
+        apiService.request<EmptyResponse>(
             endpoint = "/jobs/$id/apply/",
             method = "POST",
             body = mapOf("answers" to stringKeyedAnswers),

@@ -42,7 +42,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import com.cloutgrid.androidapp.data.model.HeaderAction
-import com.cloutgrid.androidapp.models.CategoryList
+import com.cloutgrid.androidapp.ui.components.CategoryList
 import com.cloutgrid.androidapp.ui.components.CategorySheet
 import com.cloutgrid.androidapp.ui.components.CloutHeader
 import com.cloutgrid.androidapp.ui.components.CloutSheet

@@ -12,6 +12,10 @@ import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -28,6 +32,8 @@ fun Security(
     onNavigateBack: () -> Unit,
     profile: ProfileManager = hiltViewModel()
 ) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -48,23 +54,23 @@ fun Security(
                 .padding(paddingValues),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = OffWhite
-                    )
-                ) {
-                    ListRow(
-                        title = "Change password",
-                        icon = Icons.Outlined.Lock,
-                        onClick = { }
-                    )
-                }
-            }
+//            item {
+//                Card(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 16.dp),
+//                    shape = RoundedCornerShape(20.dp),
+//                    colors = CardDefaults.cardColors(
+//                        containerColor = OffWhite
+//                    )
+//                ) {
+//                    ListRow(
+//                        title = "Change password",
+//                        icon = Icons.Outlined.Lock,
+//                        onClick = { }
+//                    )
+//                }
+//            }
 
             item {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -81,11 +87,37 @@ fun Security(
                     ListRow(
                         title = "Delete account",
                         icon = Icons.Outlined.DeleteOutline,
-                        onClick = { },
+                        onClick = { showDeleteDialog = true },
                         danger = true
                     )
                 }
             }
         }
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Account") },
+            text = { Text("Are you sure you want to delete your account? " +
+                    "This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        profile.handleAccountDelete()
+                        showDeleteDialog = false
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDeleteDialog = false }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }

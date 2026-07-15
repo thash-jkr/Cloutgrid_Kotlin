@@ -16,7 +16,9 @@ import com.cloutgrid.androidapp.data.repository.AuthRepository
 import com.cloutgrid.androidapp.data.repository.HomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -46,11 +48,16 @@ class ProfileManager @Inject constructor(
 
     val comments = mutableStateListOf<CommentModel>()
 
+    private val _events = Channel<Boolean>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
+
     var isLoading by mutableStateOf(false)
         private set
 
     var errorMessage by mutableStateOf<String?>(null)
         private set
+
+    var successMessage by mutableStateOf<String?>(null)
 
     fun fetchProfile(username: String, other: Boolean) {
         viewModelScope.launch {
@@ -280,6 +287,29 @@ class ProfileManager @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()
+        }
+    }
+
+    fun handleAccountDelete() {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = null
+            successMessage = null
+
+            try {
+                val type = user.value?.profile?.userType ?: throw Exception("User not found")
+
+                authRepository.deleteAccount(type)
+                successMessage = "Account deleted"
+                _events.send(true)
+            } catch (
+                e: Exception
+            ) {
+                errorMessage = e.localizedMessage ?: "An error occurred during authentication"
+                _events.send(false)
+            } finally {
+                isLoading = false
+            }
         }
     }
 }

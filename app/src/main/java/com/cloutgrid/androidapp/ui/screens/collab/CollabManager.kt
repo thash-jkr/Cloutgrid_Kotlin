@@ -28,6 +28,11 @@ class CollabManager @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = null
     )
+    val type = authRepository.type.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
 
     val jobs = collabRepository.jobs
     val applications = collabRepository.applications
@@ -103,9 +108,11 @@ class CollabManager @Inject constructor(
         viewModelScope.launch {
             isLoading = true
             errorMessage = null
+            successMessage = null
 
             try {
                 collabRepository.createJob(title, description, requirements, targetCreator, questions)
+                successMessage = "Collaboration Created"
                 _events.send(true)
             } catch (e: Exception) {
                 errorMessage = e.localizedMessage ?: "An error occurred"
@@ -119,11 +126,11 @@ class CollabManager @Inject constructor(
     fun deleteJob(id: Int) {
         viewModelScope.launch {
             errorMessage = null
+            successMessage = null
 
             try {
                 collabRepository.deleteJob(id)
-                jobs.removeAll { it.id == id }
-                applications.clear()
+                successMessage = "Collaboration Deleted"
                 _events.send(true)
             } catch (e: Exception) {
                 errorMessage = e.localizedMessage ?: "An error occurred"

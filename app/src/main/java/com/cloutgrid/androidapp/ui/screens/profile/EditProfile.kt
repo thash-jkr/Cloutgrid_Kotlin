@@ -1,7 +1,6 @@
 package com.cloutgrid.androidapp.ui.screens.profile
 
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -23,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -47,7 +45,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -58,11 +55,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.cloutgrid.androidapp.data.model.HeaderAction
 import com.cloutgrid.androidapp.data.network.ApiConfig
-import com.cloutgrid.androidapp.models.CategoryList
+import com.cloutgrid.androidapp.ui.components.CategoryList
 import com.cloutgrid.androidapp.ui.components.CategorySheet
 import com.cloutgrid.androidapp.ui.components.CloutHeader
 import com.cloutgrid.androidapp.ui.components.CloutSheet
-import io.ktor.util.collections.getValue
 import io.ktor.utils.io.InternalAPI
 import java.io.ByteArrayOutputStream
 

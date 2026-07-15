@@ -11,10 +11,15 @@ import com.cloutgrid.androidapp.data.model.LoginResponse
 import com.cloutgrid.androidapp.data.model.UserContainer
 import com.cloutgrid.androidapp.data.network.APIService
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
@@ -31,6 +36,7 @@ class AuthRepository @Inject constructor(
 ) {
     private val dataStore = context.authDataStore
     private val json = Json { ignoreUnknownKeys = true }
+    private val repositoryScope = CoroutineScope(Dispatchers.IO)
 
     private object PreferencesKeys {
         val ACCESS_TOKEN = stringPreferencesKey("access")
@@ -41,16 +47,29 @@ class AuthRepository @Inject constructor(
 
     val access: Flow<String?> = dataStore.data.map { it[PreferencesKeys.ACCESS_TOKEN] }
     val refresh: Flow<String?> = dataStore.data.map { it[PreferencesKeys.REFRESH_TOKEN] }
-    val type: Flow<String> = dataStore.data.map { it[PreferencesKeys.USER_TYPE] ?: "creator" }
+    val type: Flow<String?> = dataStore.data.map { it[PreferencesKeys.USER_TYPE] }
 
-    val isAuth: Flow<Boolean> = access.map { !it.isNullOrEmpty() }
+    private val _isAuth = MutableStateFlow<Boolean?>(null) // null = not yet determined
+    val isAuth: StateFlow<Boolean?> = _isAuth.asStateFlow()
 
-    val user: Flow<UserContainer?> = dataStore.data.map { prefs ->
-        val userJson = prefs[PreferencesKeys.USER_DATA] ?: return@map null
-        try {
-            json.decodeFromString<UserContainer>(userJson)
-        } catch (e: Exception) {
-            null
+    private val _user = MutableStateFlow<UserContainer?>(null)
+    val user: StateFlow<UserContainer?> = _user.asStateFlow()
+
+    init {
+        repositoryScope.launch {
+            dataStore.data.collect { prefs ->
+                val accessToken = prefs[PreferencesKeys.ACCESS_TOKEN]
+                val userJson = prefs[PreferencesKeys.USER_DATA]
+
+                _isAuth.value = !accessToken.isNullOrEmpty()
+                _user.value = userJson?.let {
+                    try {
+                        json.decodeFromString<UserContainer>(it)
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+            }
         }
     }
 
@@ -172,5 +191,17 @@ class AuthRepository @Inject constructor(
             body = mapOf("email" to email),
             requireAuth = false
         )
+    }
+
+    suspend fun deleteAccount(
+        type: String
+    ) {
+        apiService.request<EmptyResponse>(
+            endpoint = "/delete/$type/",
+            method = "DELETE",
+            requireAuth = true
+        )
+
+        clearSession()
     }
 }

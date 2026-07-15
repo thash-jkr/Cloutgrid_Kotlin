@@ -83,6 +83,10 @@ fun ProfileScreen(
         if (user != null && profile.posts.isEmpty()) {
             profile.fetchPosts(user?.profile?.username ?: "", false)
         }
+
+        if (user?.profile?.userType == "business" && profile.collabs.isEmpty()) {
+            profile.fetchCollabs(user?.profile?.username ?: "", false)
+        }
     }
 
     Scaffold(

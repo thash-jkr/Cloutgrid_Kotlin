@@ -20,10 +20,8 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.cloutgrid.androidapp.data.model.UserContainer
 import com.cloutgrid.androidapp.data.network.ApiConfig
-import com.cloutgrid.androidapp.models.CategoryList
 import com.cloutgrid.androidapp.ui.components.CloutCapsule
 import com.cloutgrid.androidapp.ui.theme.First
-import com.cloutgrid.androidapp.ui.theme.Second
 
 @Composable
 fun ProfileHeader(

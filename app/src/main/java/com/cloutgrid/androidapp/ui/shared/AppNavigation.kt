@@ -8,7 +8,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.cloutgrid.androidapp.data.model.PostModel
 import com.cloutgrid.androidapp.ui.screens.create.CreatePost
-import com.cloutgrid.androidapp.ui.screens.messaging.ChatScreen
 import com.cloutgrid.androidapp.ui.screens.profile.EditProfile
 import com.cloutgrid.androidapp.ui.screens.profile.OtherProfile
 import com.cloutgrid.androidapp.ui.screens.profile.Settings
@@ -16,15 +15,19 @@ import com.cloutgrid.androidapp.ui.screens.profile.Security
 import com.cloutgrid.androidapp.ui.screens.profile.PostDetail
 import kotlinx.serialization.Serializable
 import androidx.core.net.toUri
-import com.cloutgrid.androidapp.data.model.QuestionModel
 import com.cloutgrid.androidapp.ui.components.TestScreen
+import com.cloutgrid.androidapp.ui.screens.collab.Answers
+import com.cloutgrid.androidapp.ui.screens.collab.CollabCreate
 import com.cloutgrid.androidapp.ui.screens.collab.Questions
+import com.cloutgrid.androidapp.ui.screens.messaging.ChatScreen
 
 @Serializable object TabNavigator
 @Serializable object ChatScreen
 @Serializable object Settings
 @Serializable object Security
 @Serializable object EditProfile
+@Serializable object CreateCollabRoute
+@Serializable object TestRoute
 
 @Serializable data class PostDetailRoute(
     val id: Int,
@@ -37,6 +40,9 @@ import com.cloutgrid.androidapp.ui.screens.collab.Questions
     val selectedImage: String
 )
 @Serializable data class QuestionsRoute(
+    val id: Int
+)
+@Serializable data class AnswersRoute(
     val id: Int
 )
 
@@ -83,11 +89,26 @@ fun AppNavigation() {
                     navController.navigate(
                         QuestionsRoute(id)
                     )
+                },
+                onNavigateToAnswers = { id: Int ->
+                    navController.navigate(
+                        AnswersRoute(id)
+                    )
+                },
+                onNavigateToCreateCollab = {
+                    navController.navigate(CreateCollabRoute)
+                },
+                onNavigateToTest = {
+                    navController.navigate(TestRoute)
                 }
             )
         }
 
         composable<ChatScreen> {
+            ChatScreen()
+        }
+
+        composable<TestRoute> {
             TestScreen()
         }
 
@@ -153,6 +174,26 @@ fun AppNavigation() {
 
             Questions(
                 id = args.id,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<AnswersRoute> { backStackEntry ->
+            val args = backStackEntry.toRoute<AnswersRoute>()
+
+            Answers(
+                id = args.id,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToOtherProfile = { username: String ->
+                    navController.navigate(
+                        OtherProfileRoute(username)
+                    )
+                }
+            )
+        }
+
+        composable<CreateCollabRoute> {
+            CollabCreate(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

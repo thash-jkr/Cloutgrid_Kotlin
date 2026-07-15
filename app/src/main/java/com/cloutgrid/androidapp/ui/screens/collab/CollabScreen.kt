@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,7 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.cloutgrid.androidapp.data.model.JobModel
-import com.cloutgrid.androidapp.models.CategoryList
+import com.cloutgrid.androidapp.data.network.ApiConfig
+import com.cloutgrid.androidapp.ui.components.CategoryList
 import com.cloutgrid.androidapp.ui.components.CloutHeader
 import com.cloutgrid.androidapp.ui.components.CloutSheet
 import com.cloutgrid.androidapp.ui.components.Empty
@@ -38,9 +40,12 @@ fun CollabScreen(
     scaffoldPadding: PaddingValues,
     onNavigateToQuestions: (Int) -> Unit,
     onNavigateToOtherProfile: (String) -> Unit,
+    onNavigateToAnswers: (Int) -> Unit,
 ) {
     var selectedJob by remember { mutableStateOf<JobModel?>(null) }
     val context = LocalContext.current
+
+    val type by collab.type.collectAsState()
 
     LaunchedEffect(Unit) {
         collab.events.collect { success ->
@@ -52,9 +57,13 @@ fun CollabScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(type) {
         if (collab.jobs.isEmpty()) {
-            collab.fetchJobs()
+            if (type == "creator") {
+                collab.fetchJobs()
+            } else {
+                collab.fetchBusinessJobs()
+            }
         }
     }
 
@@ -69,7 +78,11 @@ fun CollabScreen(
         PullToRefreshBox(
             isRefreshing = collab.isLoading && collab.jobs.isNotEmpty(),
             onRefresh = {
-                collab.fetchJobs()
+                if (type == "creator") {
+                    collab.fetchJobs()
+                } else {
+                    collab.fetchBusinessJobs()
+                }
             },
             modifier = Modifier.fillMaxSize()
         ) {
@@ -84,7 +97,8 @@ fun CollabScreen(
                     ListItem(
                         leadingContent = @Composable {
                             AsyncImage(
-                                model = job.postedBy.profile.profilePhoto,
+                                model = if (type == "creator") job.postedBy.profile.profilePhoto
+                                else ApiConfig.current.baseURL + job.postedBy.profile.profilePhoto,
                                 contentDescription = "profile photo",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
@@ -93,7 +107,11 @@ fun CollabScreen(
                             )
                         },
                         supportingContent = @Composable {
-                            Text(CategoryList.label(job.postedBy.targetAudience ?: ""))
+                            if (type == "creator") {
+                                Text(CategoryList.label(job.postedBy.targetAudience ?: ""))
+                            } else {
+                                Text("Posted: ${job.timeAgo}")
+                            }
                         },
                         onClick = { selectedJob = job },
                         colors = ListItemDefaults.colors(
@@ -120,14 +138,25 @@ fun CollabScreen(
             CloutSheet(
                 {selectedJob = null},
             ) {
-                CollabDetail(
-                    job,
-                    onNavigateToQuestions = onNavigateToQuestions,
-                    onNavigateToOtherProfile = onNavigateToOtherProfile,
-                    onClose = {
-                        selectedJob = null
-                    }
-                )
+                if (type == "creator") {
+                    CollabDetail(
+                        job,
+                        onNavigateToQuestions = onNavigateToQuestions,
+                        onNavigateToOtherProfile = onNavigateToOtherProfile,
+                        onClose = {
+                            selectedJob = null
+                        }
+                    )
+                } else {
+                    Applications(
+                        job = job,
+                        onNavigateToOtherProfile = onNavigateToOtherProfile,
+                        onNavigateToAnswers = onNavigateToAnswers,
+                        onClose = {
+                            selectedJob = null
+                        }
+                    )
+                }
             }
         }
     }

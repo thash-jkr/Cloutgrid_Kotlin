@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Card
@@ -18,17 +19,17 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cloutgrid.androidapp.models.CategoryList
 import com.cloutgrid.androidapp.ui.theme.OffWhite
 import com.cloutgrid.androidapp.ui.theme.Second
 
@@ -56,66 +57,64 @@ fun CategorySheet(
                 modifier = Modifier
                     .fillMaxSize(),
                 contentPadding = PaddingValues(
-                    start = 16.dp,
+                    start = 15.dp,
                     top = innerPadding.calculateTopPadding(),
-                    end = 16.dp,
+                    end = 15.dp,
                     bottom = 100.dp
                 ),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
             ) {
-                item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            OffWhite
-                        )
-                    ) {
-                        categories.forEachIndexed { index, category ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = category.label,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .clickable { onCategorySelected(category) }
-                                        .padding(horizontal = 20.dp, vertical = 16.dp),
-                                    fontWeight = if (category.value == selectedCategory) {
-                                        FontWeight.Bold
-                                    } else {
-                                        FontWeight.Normal
-                                    },
-                                    color = if (category.value == selectedCategory) {
-                                        Second
-                                    } else {
-                                        Color.Black
-                                    },
-                                )
+                itemsIndexed(categories, key = { _, job -> job.id }) { index, category ->
+                    val isSelected = category.value == selectedCategory
 
-                                if (category.value == selectedCategory) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Check,
-                                        contentDescription = "Checkmark",
-                                        modifier = Modifier
-                                            .padding(end = 20.dp)
-                                            .size(25.dp),
-                                        tint = Second
-                                    )
+                    SegmentedListItem(
+                        shapes = ListItemDefaults.segmentedShapes(index = index, count = categories.count()),
+                        trailingContent = {
+                            Icon(
+                                imageVector = CategoryList.icon(category.value),
+                                contentDescription = category.label,
+                                tint = if (isSelected) {
+                                    Color.White
+                                } else {
+                                    Color.Black
                                 }
+                            )
+                        },
+                        colors = ListItemDefaults.colors(
+                            containerColor = OffWhite,
+                            selectedContainerColor = Second
+                        ),
+                        onClick = {
+                            onCategorySelected(category)
+                        },
+                        selected = isSelected
+                    ) {
+                        Text(
+                            category.label,
+                            fontWeight = if (isSelected) {
+                                FontWeight.Bold
+                            } else {
+                                FontWeight.Normal
+                            },
+                            color = if (isSelected) {
+                                Color.White
+                            } else {
+                                Color.Black
                             }
-
-                            if (index < categories.lastIndex) {
-                                HorizontalDivider(
-                                    modifier = Modifier
-                                        .padding(horizontal = 20.dp),
-                                    thickness = 0.5.dp
-                                )
-                            }
-                        }
+                        )
                     }
                 }
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun CategorySheetPreview() {
+    CategorySheet(
+        categories = CategoryList.allOptions,
+        selectedCategory = "Business",
+        onCategorySelected = {}
+    )
 }

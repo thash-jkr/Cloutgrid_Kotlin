@@ -10,11 +10,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.rounded.AddCircle
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Person
@@ -58,6 +53,9 @@ fun TabNavigator(
     onNavigateToOtherProfile: (String) -> Unit,
     onNavigateToCreatePost: (Uri) -> Unit,
     onNavigateToQuestions: (Int) -> Unit,
+    onNavigateToAnswers: (Int) -> Unit,
+    onNavigateToCreateCollab: () -> Unit,
+    onNavigateToTest: () -> Unit,
 ) {
     val tabs = TabItem.entries.toTypedArray()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
@@ -144,6 +142,7 @@ fun TabNavigator(
                     onSelectTab = selectTab,
                     onNavigateToChatScreen = onNavigateToChatScreen,
                     onNavigateToOtherProfile = onNavigateToOtherProfile,
+                    onNavigateToTest = onNavigateToTest
                 )
                 TabItem.Search -> SearchScreen(
                     scaffoldPadding = paddingValues,
@@ -151,12 +150,14 @@ fun TabNavigator(
                     onNavigateToOtherProfile = onNavigateToOtherProfile
                 )
                 TabItem.Create -> CreateScreen(
-                    onNavigateToCreatePost = onNavigateToCreatePost
+                    onNavigateToCreatePost = onNavigateToCreatePost,
+                    onNavigateToCreateCollab = onNavigateToCreateCollab,
                 )
                 TabItem.Jobs -> CollabScreen(
                     scaffoldPadding = paddingValues,
                     onNavigateToQuestions = onNavigateToQuestions,
-                    onNavigateToOtherProfile = onNavigateToOtherProfile
+                    onNavigateToOtherProfile = onNavigateToOtherProfile,
+                    onNavigateToAnswers = onNavigateToAnswers
                 )
                 TabItem.Profile -> ProfileScreen(
                     scaffoldPadding = paddingValues,

@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cloutgrid.androidapp.ui.theme.OffWhite
 
 @Composable
 fun ToolbarButton(
@@ -33,7 +34,7 @@ fun ToolbarButton(
             )
             .size(45.dp),
         colors = IconButtonDefaults.filledTonalIconButtonColors(
-            containerColor = MaterialTheme.colorScheme.background,
+            containerColor = OffWhite,
             contentColor = MaterialTheme.colorScheme.onSurface
         )
     ) {

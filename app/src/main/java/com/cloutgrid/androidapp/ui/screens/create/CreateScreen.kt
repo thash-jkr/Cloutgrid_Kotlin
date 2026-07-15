@@ -42,6 +42,7 @@ import androidx.core.content.FileProvider
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.cloutgrid.androidapp.R
 import com.cloutgrid.androidapp.ui.components.CloutHeader
+import com.cloutgrid.androidapp.ui.theme.OffWhite
 import java.io.File
 import java.io.FileOutputStream
 
@@ -49,7 +50,8 @@ import java.io.FileOutputStream
 @Composable
 fun CreateScreen(
     create: CreateManager = hiltViewModel(),
-    onNavigateToCreatePost: (Uri) -> Unit
+    onNavigateToCreatePost: (Uri) -> Unit,
+    onNavigateToCreateCollab: () -> Unit
 ) {
     val user by create.user.collectAsState()
 
@@ -106,7 +108,7 @@ fun CreateScreen(
                         .padding(16.dp, 10.dp)
                         .fillMaxWidth(),
                     colors = CardDefaults.elevatedCardColors(
-                        containerColor = MaterialTheme.colorScheme.background
+                        containerColor = OffWhite
                     ),
                     shape = RoundedCornerShape(20.dp),
                 ) {
@@ -140,12 +142,14 @@ fun CreateScreen(
 
                 if (!isCreator) {
                     ElevatedCard(
-                        onClick = {},
+                        onClick = {
+                            onNavigateToCreateCollab()
+                        },
                         modifier = Modifier
                             .padding(16.dp, 10.dp)
                             .fillMaxWidth(),
                         colors = CardDefaults.elevatedCardColors(
-                            containerColor = MaterialTheme.colorScheme.background
+                            containerColor = OffWhite
                         ),
                         shape = RoundedCornerShape(20.dp),
                     ) {

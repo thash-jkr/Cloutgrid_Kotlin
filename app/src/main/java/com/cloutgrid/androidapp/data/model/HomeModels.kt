@@ -32,22 +32,19 @@ data class CommentModel(
     val content: String,
     @SerialName("commented_at") val commentedAt: String
 ) {
-    // Replaces Swift's computed property using a custom Kotlin getter
     val timeAgo: String
         get() {
             return try {
-                // Parses standard ISO8601 internet date strings automatically
                 val commentMillis = Instant.parse(commentedAt).toEpochMilli()
                 val nowMillis = Instant.now().toEpochMilli()
 
-                // Matches Swift's abbreviated RelativeDateTimeFormatter (e.g. "2h ago", "45m ago")
                 DateUtils.getRelativeTimeSpanString(
                     commentMillis,
                     nowMillis,
                     DateUtils.MINUTE_IN_MILLIS,
                     DateUtils.FORMAT_ABBREV_ALL
                 ).toString()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 "Just now"
             }
         }

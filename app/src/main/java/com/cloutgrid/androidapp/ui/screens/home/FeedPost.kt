@@ -393,7 +393,7 @@ fun FeedPost(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showBlockDialog = false }) {
+                TextButton(onClick = { showDeleteDialog = false }) {
                     Text("Cancel")
                 }
             },

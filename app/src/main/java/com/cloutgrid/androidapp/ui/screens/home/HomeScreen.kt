@@ -1,16 +1,17 @@
 package com.cloutgrid.androidapp.ui.screens.home
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.rounded.ChatBubbleOutline
 import androidx.compose.material.icons.rounded.NotificationsNone
+import androidx.compose.material.icons.rounded.SettingsBackupRestore
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LoadingIndicator
@@ -46,6 +47,7 @@ fun HomeScreen(
     onNavigateToChatScreen: () -> Unit,
     onNavigateToOtherProfile: (String) -> Unit,
     onSelectTab: (TabItem) -> Unit,
+    onNavigateToTest: () -> Unit,
 ) {
     var showNotificationSheet by remember { mutableStateOf(false) }
     var selectedPostId by remember { mutableStateOf<Int?>(null) }
@@ -105,7 +107,12 @@ fun HomeScreen(
                         icon = Icons.Rounded.ChatBubbleOutline,
                         contentDescription = "Direct Messages",
                         onClick = { onNavigateToChatScreen() }
-                    )
+                    ),
+                    HeaderAction(
+                        icon = Icons.Rounded.SettingsBackupRestore,
+                        contentDescription = "Test",
+                        onClick = { onNavigateToTest() }
+                    ),
                 )
             )
         }
@@ -124,55 +131,63 @@ fun HomeScreen(
             },
             modifier = Modifier.fillMaxSize()
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(
-                    top = innerPadding.calculateTopPadding(),
-                    bottom = scaffoldPadding.calculateBottomPadding()
-                ),
-                state = feedState
-            ) {
-                items(
-                    items = posts,
-                    key = { it.id },
-                ) { post ->
-                    FeedPost(
-                        post = post,
-                        onLikeClick = { home.likePost(post.id) },
-                        onCommentClick = {
-                            home.fetchComments(post.id)
-                            selectedPostId = post.id
-                        },
-                        onUserClick = {
-                            username ->
-                            run {
-                                if (username == user?.profile?.username) {
-                                    onSelectTab(TabItem.Profile)
-                                } else {
-                                    onNavigateToOtherProfile(username)
-                                }
-                            }
-                        },
-                        onBlockClick = {
-                            home.handleBlock(
-                                post.postedBy.profile.username,
-                                true
-                            )
-                        },
-                        isOwner = post.postedBy.profile.username == user?.profile?.username,
-                        onDeleteClick = {
-                            home.deletePost(post.id)
-                        }
-                    )
+            if (home.posts.isEmpty() && home.isLoading) {
+                Column(
+                    modifier = Modifier.padding(top = innerPadding.calculateTopPadding())
+                ) {
+                    FeedLoading()
                 }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = scaffoldPadding.calculateBottomPadding()
+                    ),
+                    state = feedState
+                ) {
+                    items(
+                        items = posts,
+                        key = { it.id },
+                    ) { post ->
+                        FeedPost(
+                            post = post,
+                            onLikeClick = { home.likePost(post.id) },
+                            onCommentClick = {
+                                home.fetchComments(post.id)
+                                selectedPostId = post.id
+                            },
+                            onUserClick = {
+                                    username ->
+                                run {
+                                    if (username == user?.profile?.username) {
+                                        onSelectTab(TabItem.Profile)
+                                    } else {
+                                        onNavigateToOtherProfile(username)
+                                    }
+                                }
+                            },
+                            onBlockClick = {
+                                home.handleBlock(
+                                    post.postedBy.profile.username,
+                                    true
+                                )
+                            },
+                            isOwner = post.postedBy.profile.username == user?.profile?.username,
+                            onDeleteClick = {
+                                home.deletePost(post.id)
+                            }
+                        )
+                    }
 
-                if (home.posts.isNotEmpty() && home.isLoading) {
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            LoadingIndicator()
+                    if (home.posts.isNotEmpty() && home.isLoading) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                LoadingIndicator()
+                            }
                         }
                     }
                 }

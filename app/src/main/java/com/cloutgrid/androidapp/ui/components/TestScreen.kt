@@ -95,67 +95,43 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TestScreen() {
-    Icon(
-        imageVector = Icons.Rounded.FavoriteBorder,
-        contentDescription = "Like",
-        tint = Color.White,
-        modifier = Modifier
-            .size(30.dp),
-    )
+    SegmentedListItems()
 }
 
 @Composable
-fun SegmentedListItemWithExpansionSample() {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-    val numChildren = 3
-    val itemCount = 1 + if (expanded) numChildren else 0
-    val childrenChecked = rememberSaveable { mutableStateListOf(*Array(numChildren) { false }) }
+fun SegmentedListItems() {
+    val count = 4
     val colors =
         ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-    ) {
-        Spacer(Modifier.height(100.dp))
+    Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
         SegmentedListItem(
-            onClick = { expanded = !expanded },
-            modifier =
-                Modifier.semantics { stateDescription = if (expanded) "Expanded" else "Collapsed" },
+            shapes = ListItemDefaults.segmentedShapes(index = 0, count = count),
             colors = colors,
-            shapes = ListItemDefaults.segmentedShapes(index = 0, count = itemCount),
-            leadingContent = { Icon(Icons.Default.Favorite, contentDescription = null) },
-            trailingContent = {
-                Icon(
-                    if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = null,
-                )
-            },
-            content = { Text("Click to expand/collapse") },
+            leadingContent = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+            content = { Text("One line list item") },
         )
-        AnimatedVisibility(
-            visible = expanded,
-            enter = expandVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
-            exit = shrinkVertically(MaterialTheme.motionScheme.fastSpatialSpec()),
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
-                repeat(numChildren) { idx ->
-                    SegmentedListItem(
-                        checked = childrenChecked[idx],
-                        onCheckedChange = { childrenChecked[idx] = it },
-                        colors = colors,
-                        shapes =
-                            ListItemDefaults.segmentedShapes(index = idx + 1, count = itemCount),
-                        leadingContent = {
-                            Icon(Icons.Default.Favorite, contentDescription = null)
-                        },
-                        trailingContent = {
-                            Checkbox(checked = childrenChecked[idx], onCheckedChange = null)
-                        },
-                        content = { Text("Child ${idx + 1}") },
-                    )
-                }
-            }
-        }
+        SegmentedListItem(
+            shapes = ListItemDefaults.segmentedShapes(index = 1, count = count),
+            colors = colors,
+            leadingContent = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+            supportingContent = { Text("Supporting text") },
+            content = { Text("Two line list item") },
+        )
+        SegmentedListItem(
+            shapes = ListItemDefaults.segmentedShapes(index = 2, count = count),
+            colors = colors,
+            leadingContent = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+            overlineContent = { Text("Overline text") },
+            supportingContent = { Text("Supporting text") },
+            content = { Text("Three line list item") },
+        )
+        SegmentedListItem(
+            shapes = ListItemDefaults.segmentedShapes(index = 3, count = count),
+            colors = colors,
+            leadingContent = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+            supportingContent = { Text("Supporting text\nthat is multiple lines") },
+            content = { Text("Another three line list item") },
+        )
     }
 }
 

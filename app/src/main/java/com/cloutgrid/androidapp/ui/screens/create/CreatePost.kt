@@ -63,7 +63,7 @@ import coil3.compose.AsyncImage
 import com.cloutgrid.androidapp.data.model.HeaderAction
 import com.cloutgrid.androidapp.data.model.UserContainer
 import com.cloutgrid.androidapp.data.network.ApiConfig
-import com.cloutgrid.androidapp.models.CategoryList
+import com.cloutgrid.androidapp.ui.components.CategoryList
 import com.cloutgrid.androidapp.ui.components.CloutHeader
 import com.cloutgrid.androidapp.ui.components.CloutSheet
 import com.cloutgrid.androidapp.ui.components.Empty

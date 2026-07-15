@@ -22,7 +22,7 @@ fun OtherYouTube(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Text(
-            "Instagram Insights",
+            "YouTube Analytics",
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 20.dp)

@@ -50,6 +50,7 @@ import com.cloutgrid.androidapp.ui.components.CloutCapsule
 import com.cloutgrid.androidapp.ui.components.CloutHeader
 import com.cloutgrid.androidapp.ui.components.Empty
 import com.cloutgrid.androidapp.ui.shared.TabItem
+import com.cloutgrid.androidapp.ui.theme.OffWhite
 import com.cloutgrid.androidapp.ui.theme.Second
 
 @Composable
@@ -90,82 +91,94 @@ fun SearchScreen(
             },
             modifier = Modifier.fillMaxSize()
         ) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(
-                    top = innerPadding.calculateTopPadding(),
-                    bottom = scaffoldPadding.calculateBottomPadding(),
-                    start = 10.dp,
-                    end = 10.dp
-                ),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    OutlinedTextField(
-                        value = query,
-                        onValueChange = { query = it },
-                        label = { Text("Search") },
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White
-                        )
+            if (search.suggestions.isEmpty() && search.isLoading) {
+                Column(
+                    modifier = Modifier.padding(top = innerPadding.calculateTopPadding())
+                ) {
+                    Empty(
+                        type = "general",
+                        message = "Loading...",
+                        isLoading = search.isLoading
                     )
                 }
-
-                if (userList.isEmpty() && query.isNotEmpty()) {
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = scaffoldPadding.calculateBottomPadding(),
+                        start = 10.dp,
+                        end = 10.dp
+                    ),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
                     item(span = { GridItemSpan(maxLineSpan) }) {
-                        Empty(
-                            type = "general",
-                            message = "No results found",
-                            isLoading = search.isLoading
+                        OutlinedTextField(
+                            value = query,
+                            onValueChange = { query = it },
+                            label = { Text("Search") },
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = Color.White,
+                                unfocusedContainerColor = Color.White
+                            )
                         )
                     }
-                } else {
-                    items(userList, key = { it.profile.id }) { user ->
-                        ElevatedCard(
-                            onClick = {
-                                if (user.profile.username == "") {
-                                    onSelectTab(TabItem.Profile)
-                                } else {
-                                    onNavigateToOtherProfile(user.profile.username)
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(20.dp),
-                            colors = CardDefaults.elevatedCardColors(
-                                containerColor = MaterialTheme.colorScheme.background
-                            ),
-                            elevation = CardDefaults.elevatedCardElevation()
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
+
+                    if (userList.isEmpty() && query.isNotEmpty()) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            Empty(
+                                type = "general",
+                                message = "No results found",
+                                isLoading = search.isLoading
+                            )
+                        }
+                    } else {
+                        items(userList, key = { it.profile.id }) { user ->
+                            ElevatedCard(
+                                onClick = {
+                                    if (user.profile.username == "") {
+                                        onSelectTab(TabItem.Profile)
+                                    } else {
+                                        onNavigateToOtherProfile(user.profile.username)
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(20.dp),
+                                colors = CardDefaults.elevatedCardColors(
+                                    containerColor = OffWhite
+                                ),
+                                elevation = CardDefaults.elevatedCardElevation()
                             ) {
-                                AsyncImage(
-                                    model = ApiConfig.current.baseURL + user.profile.profilePhoto,
-                                    contentDescription = "${user.profile.name}'s profile photo",
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .aspectRatio(1f)
-                                )
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
+                                ) {
+                                    AsyncImage(
+                                        model = ApiConfig.current.baseURL + user.profile.profilePhoto,
+                                        contentDescription = "${user.profile.name}'s profile photo",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .aspectRatio(1f)
+                                    )
 
-                                Text(
-                                    text = user.profile.name,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
+                                    Text(
+                                        text = user.profile.name,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
 
-                                CloutCapsule(user.area ?: user.targetAudience ?: "Creator")
+                                    CloutCapsule(user.area ?: user.targetAudience ?: "Creator")
 
-                                Spacer(modifier = Modifier.height(5.dp))
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                }
                             }
                         }
                     }
