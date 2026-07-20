@@ -84,7 +84,6 @@ fun MoreInfoScreen(onNavigateBack: () -> Unit, auth: AuthManager, onNavigateToLo
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
                 .padding(innerPadding)
         ) {
             Column(

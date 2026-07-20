@@ -10,6 +10,7 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -27,6 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,11 +41,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -67,6 +71,7 @@ import com.cloutgrid.androidapp.ui.components.CategoryList
 import com.cloutgrid.androidapp.ui.components.CloutHeader
 import com.cloutgrid.androidapp.ui.components.CloutSheet
 import com.cloutgrid.androidapp.ui.components.Empty
+import com.cloutgrid.androidapp.ui.theme.OffWhite
 import kotlinx.coroutines.delay
 import java.io.ByteArrayOutputStream
 import kotlin.time.Duration.Companion.milliseconds
@@ -119,7 +124,7 @@ fun CreatePost(
     }
 
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = OffWhite,
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(WindowInsets.ime),
         topBar = {
             CloutHeader(
@@ -219,7 +224,10 @@ fun CreatePost(
                             disabledBorderColor = MaterialTheme.colorScheme.outline,
                             disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        ),
+                        supportingText = {
+                            Text("Optional – If you collaborated with any businesses for this post, mention them")
+                        }
                     )
                 }
             }
@@ -260,7 +268,7 @@ private fun CollabSheet(
     }
 
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = OffWhite,
         topBar = {
             CloutHeader(
                 title = "Search Collaboration",
@@ -273,9 +281,10 @@ private fun CollabSheet(
             LazyColumn(
                 contentPadding = PaddingValues(
                     top = innerPadding.calculateTopPadding(),
-                    start = 10.dp,
-                    end = 10.dp
-                )
+                    start = 15.dp,
+                    end = 15.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
             ) {
                 item {
                     OutlinedTextField(
@@ -287,9 +296,9 @@ private fun CollabSheet(
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White
-                        )
+                            focusedContainerColor = OffWhite,
+                            unfocusedContainerColor = OffWhite
+                         )
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -306,8 +315,9 @@ private fun CollabSheet(
                     }
                 }
 
-                items(items = create.collabs) { collab ->
-                    ListItem(
+                itemsIndexed(items = create.collabs) { index, collab ->
+                    SegmentedListItem(
+                        shapes = ListItemDefaults.segmentedShapes(index = index, count = create.collabs.count()),
                         leadingContent = @Composable {
                             AsyncImage(
                                 model = ApiConfig.current.baseURL + collab.profile.profilePhoto,
@@ -324,7 +334,6 @@ private fun CollabSheet(
                         selected = collab.profile.username == selectedCollab?.profile?.username,
                         onClick = {
                             onCollabSelected(collab)
-
                             query = ""
                         }
                     ) {

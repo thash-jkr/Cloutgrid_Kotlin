@@ -2,16 +2,28 @@ package com.cloutgrid.androidapp.ui.screens.profile
 
 import android.content.Intent
 import android.widget.Toast
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.HelpOutline
-import androidx.compose.material.icons.automirrored.outlined.Logout
-import androidx.compose.material.icons.automirrored.outlined.OpenInNew
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.automirrored.rounded.Help
+import androidx.compose.material.icons.automirrored.rounded.Logout
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
+import androidx.compose.material.icons.rounded.Feedback
+import androidx.compose.material.icons.rounded.Gavel
+import androidx.compose.material.icons.rounded.PrivacyTip
+import androidx.compose.material.icons.rounded.Security
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,19 +31,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import android.net.Uri
-import androidx.compose.foundation.background
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Logout
-import com.cloutgrid.androidapp.ui.components.ReportBox
-import com.cloutgrid.androidapp.ui.components.ListRow
 import androidx.core.net.toUri
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.cloutgrid.androidapp.data.model.HeaderAction
 import com.cloutgrid.androidapp.ui.components.CloutHeader
+import com.cloutgrid.androidapp.ui.components.ReportBox
 import com.cloutgrid.androidapp.ui.theme.OffWhite
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,7 +54,7 @@ fun Settings(
     val context = LocalContext.current
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        containerColor = OffWhite,
         topBar = {
             CloutHeader(
                 title = "Settings",
@@ -60,113 +66,161 @@ fun Settings(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
-                .padding(paddingValues),
-            contentPadding = PaddingValues(vertical = 16.dp)
         ) {
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = OffWhite
+            Column(
+                modifier = Modifier
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        start = 16.dp,
+                        end = 16.dp,
                     )
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
+            ) {
+                SegmentedListItem(
+                    shapes = ListItemDefaults.segmentedShapes(index = 0, count = 4),
+                    leadingContent = {
+                        Icon(
+                            Icons.AutoMirrored.Rounded.Help,
+                            contentDescription = "Help",
+                        )
+                    },
+                    onClick = {
+                        showHelpDialog = true
+                    },
+                    colors = ListItemDefaults.colors(containerColor = Color.White),
                 ) {
-                    Column {
-                        ListRow(
-                            "Help",
-                            {showHelpDialog = true},
-                            Icons.AutoMirrored.Outlined.HelpOutline,
+                    Text("Help")
+                }
+
+                SegmentedListItem(
+                    shapes = ListItemDefaults.segmentedShapes(index = 1, count = 4),
+                    leadingContent = {
+                        Icon(
+                            Icons.Rounded.PrivacyTip,
+                            contentDescription = "Privacy Icon",
                         )
-
-                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp)
-
-                        ListRow(
-                            title = "Privacy Policy",
-                            icon = Icons.Outlined.PrivacyTip,
-                            onClick = {
-                                try {
-                                    val intent = Intent(
-                                        Intent.ACTION_VIEW,
-                                        "https://cloutgrid.com/privacypolicy".toUri()
-                                    )
-                                    context.startActivity(intent)
-                                } catch (e: Exception) {
-                                    Toast.makeText(
-                                        context,
-                                        "Failed to open privacy policy",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            },
-                            endIcon = Icons.AutoMirrored.Outlined.OpenInNew
-                        )
-
-                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp)
-
-                        ListRow(
-                            title = "EULA",
-                            icon = Icons.Outlined.Gavel,
-                            endIcon = Icons.AutoMirrored.Outlined.OpenInNew,
-                            onClick = {
-                                try {
-                                    val intent = Intent(
-                                        Intent.ACTION_VIEW,
-                                        "https://cloutgrid.com/eula".toUri()
-                                    )
-                                    context.startActivity(intent)
-                                } catch (e: Exception) {
-                                    Toast.makeText(
-                                        context,
-                                        "Failed to open EULA",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                        )
-
-                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp)
-
-                        ListRow(
-                            title = "Feedback",
-                            icon = Icons.Outlined.Feedback,
-                            onClick = { showFeedbackDialog = true }
-                        )
-
-                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp)
-
-                        ListRow(
-                            title = "Security",
-                            icon = Icons.Outlined.Security,
-                            onClick = { onNavigateToSecurity() }
+                    },
+                    onClick = {
+                        try {
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                "https://cloutgrid.com/privacypolicy".toUri()
+                            )
+                            context.startActivity(intent)
+                        } catch (_: Exception) {
+                            Toast.makeText(
+                                context,
+                                "Failed to open privacy policy",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
+                    colors = ListItemDefaults.colors(containerColor = Color.White),
+                    trailingContent = {
+                        Icon(
+                            Icons.AutoMirrored.Rounded.OpenInNew,
+                            contentDescription = "Open in new tab",
                         )
                     }
+                ) {
+                    Text("Privacy Policy")
+                }
+
+                SegmentedListItem(
+                    shapes = ListItemDefaults.segmentedShapes(index = 2, count = 4),
+                    leadingContent = {
+                        Icon(
+                            Icons.Rounded.Gavel,
+                            contentDescription = "EULA",
+                        )
+                    },
+                    onClick = {
+                        try {
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                "https://cloutgrid.com/eula".toUri()
+                            )
+                            context.startActivity(intent)
+                        } catch (_: Exception) {
+                            Toast.makeText(
+                                context,
+                                "Failed to open EULA",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
+                    colors = ListItemDefaults.colors(containerColor = Color.White),
+                    trailingContent = {
+                        Icon(
+                            Icons.AutoMirrored.Rounded.OpenInNew,
+                            contentDescription = "Open in new tab",
+                        )
+                    }
+                ) {
+                    Text("EULA")
+                }
+
+                SegmentedListItem(
+                    shapes = ListItemDefaults.segmentedShapes(index = 3, count = 4),
+                    leadingContent = {
+                        Icon(
+                            Icons.Rounded.Feedback,
+                            contentDescription = "Feedback",
+                        )
+                    },
+                    onClick = {
+                        showFeedbackDialog = true
+                    },
+                    colors = ListItemDefaults.colors(containerColor = Color.White),
+                ) {
+                    Text("Feedback")
                 }
             }
 
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = OffWhite
+            Column(
+                modifier = Modifier
+                    .padding(
+                        top = paddingValues.calculateBottomPadding(),
+                        start = 16.dp,
+                        end = 16.dp,
                     )
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
+            ) {
+                SegmentedListItem(
+                    shapes = ListItemDefaults.segmentedShapes(index = 0, count = 2),
+                    leadingContent = {
+                        Icon(
+                            Icons.Rounded.Security,
+                            contentDescription = "Security",
+                        )
+                    },
+                    onClick = {
+                        onNavigateToSecurity()
+                    },
+                    colors = ListItemDefaults.colors(containerColor = Color.White),
                 ) {
-                    ListRow(
-                        title = "Logout",
-                        icon = Icons.AutoMirrored.Outlined.Logout,
-                        onClick = { showLogoutDialog = true },
-                        danger = true
-                    )
+                    Text("Security")
+                }
+
+                SegmentedListItem(
+                    shapes = ListItemDefaults.segmentedShapes(index = 1, count = 2),
+                    leadingContent = {
+                        Icon(
+                            Icons.AutoMirrored.Rounded.Logout,
+                            contentDescription = "Logout",
+                        )
+                    },
+                    onClick = {
+                        showLogoutDialog = true
+                    },
+                    colors = ListItemDefaults.colors(containerColor = Color.White),
+                ) {
+                    Text("Logout")
                 }
             }
         }

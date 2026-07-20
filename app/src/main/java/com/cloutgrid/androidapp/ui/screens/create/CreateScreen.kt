@@ -108,7 +108,7 @@ fun CreateScreen(
                         .padding(16.dp, 10.dp)
                         .fillMaxWidth(),
                     colors = CardDefaults.elevatedCardColors(
-                        containerColor = OffWhite
+                        containerColor = Color.White
                     ),
                     shape = RoundedCornerShape(20.dp),
                 ) {
@@ -149,7 +149,7 @@ fun CreateScreen(
                             .padding(16.dp, 10.dp)
                             .fillMaxWidth(),
                         colors = CardDefaults.elevatedCardColors(
-                            containerColor = OffWhite
+                            containerColor = Color.White
                         ),
                         shape = RoundedCornerShape(20.dp),
                     ) {

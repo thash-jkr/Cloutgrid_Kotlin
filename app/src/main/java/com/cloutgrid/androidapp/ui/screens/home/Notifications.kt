@@ -1,25 +1,33 @@
 package com.cloutgrid.androidapp.ui.screens.home
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.*
-import androidx.compose.material3.ListItem
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.runtime.*
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.cloutgrid.androidapp.data.model.NotificationModel
 import com.cloutgrid.androidapp.ui.components.CloutHeader
 import com.cloutgrid.androidapp.ui.components.Empty
 import com.cloutgrid.androidapp.ui.theme.OffWhite
@@ -29,12 +37,14 @@ import com.cloutgrid.androidapp.ui.theme.OffWhite
 fun Notifications(
     home: HomeManager = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) {
+    val notifications = home.notifications
+
+    LaunchedEffect(notifications) {
         home.fetchNotifications()
     }
 
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = OffWhite,
         topBar = {
             CloutHeader(
                 title = "Notifications"
@@ -45,10 +55,9 @@ fun Notifications(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            if (home.notifications.isNotEmpty()) {
+            if (notifications.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier
-                        .background(Color.White)
                         .fillMaxSize(),
                     contentPadding = PaddingValues(
                         start = 16.dp,
@@ -59,25 +68,52 @@ fun Notifications(
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     itemsIndexed(
-                        items = home.notifications,
+                        items = notifications,
                         key = { _, item -> item.id }
                     ) { index, item ->
-                        val cardShape = when {
-                            home.notifications.size == 1 -> RoundedCornerShape(20.dp)
-                            index == 0 -> RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-                            index == home.notifications.lastIndex -> RoundedCornerShape(
-                                bottomStart = 20.dp,
-                                bottomEnd = 20.dp
-                            )
-                            else -> RectangleShape
-                        }
-
-                        NotificationDismissRow(
-                            item = item,
-                            shape = cardShape,
-                            showDivider = index != home.notifications.lastIndex,
-                            onDelete = { home.readNotification(item.id) }
+                        val dismissState = rememberSwipeToDismissBoxState(
+                            positionalThreshold = { totalDistance -> totalDistance * 0.4f }
                         )
+
+                        SwipeToDismissBox(
+                            state = dismissState,
+                            enableDismissFromStartToEnd = false,
+                            enableDismissFromEndToStart = true,
+                            onDismiss = { direction ->
+                                if (direction == SwipeToDismissBoxValue.EndToStart) {
+                                    home.readNotification(item.id)
+                                }
+                            },
+                            backgroundContent = {
+                                val direction = dismissState.dismissDirection
+                                val color by animateColorAsState(
+                                    targetValue = if (direction == SwipeToDismissBoxValue.EndToStart) Color.Red else Color.Transparent,
+                                    label = "swipeBackgroundColor"
+                                )
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(color)
+                                        .padding(horizontal = 20.dp),
+                                    contentAlignment = Alignment.CenterEnd
+                                ) {
+                                    if (direction == SwipeToDismissBoxValue.EndToStart) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Delete,
+                                            contentDescription = "Dismiss notification",
+                                            tint = Color.White
+                                        )
+                                    }
+                                }
+                            }
+                        ) {
+                            SegmentedListItem(
+                                shapes = ListItemDefaults.segmentedShapes(index = index, count = notifications.count()),
+                            ) {
+                                Text(item.message)
+                            }
+                        }
                     }
                 }
             } else {
@@ -85,82 +121,4 @@ fun Notifications(
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun NotificationDismissRow(
-    item: NotificationModel,
-    shape: Shape,
-    showDivider: Boolean,
-    onDelete: () -> Unit
-) {
-    val dismissState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { newValue ->
-            if (newValue == SwipeToDismissBoxValue.EndToStart) {
-                onDelete()
-                true
-            } else {
-                false
-            }
-        }
-    )
-
-    SwipeToDismissBox(
-        state = dismissState,
-        enableDismissFromStartToEnd = false,
-        backgroundContent = {
-            val backgroundColor = when (dismissState.targetValue) {
-                SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
-                else -> Color.Transparent
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(shape)
-                    .background(backgroundColor)
-                    .padding(horizontal = 20.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = MaterialTheme.colorScheme.onErrorContainer
-                )
-            }
-        },
-        content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(shape)
-            ) {
-                ListItem(
-                    modifier = Modifier,
-                    leadingContent = null,
-                    trailingContent = null,
-                    overlineContent = null,
-                    supportingContent = null,
-                    colors = ListItemDefaults.colors(
-                        containerColor = OffWhite
-                    ),
-                    elevation = ListItemDefaults.elevation(ListItemDefaults.Elevation),
-                    content = {
-                        Text(
-                            text = item.message,
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    },
-                )
-
-                if (showDivider) {
-                    HorizontalDivider(
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
-                        thickness = 0.5.dp
-                    )
-                }
-            }
-        }
-    )
 }

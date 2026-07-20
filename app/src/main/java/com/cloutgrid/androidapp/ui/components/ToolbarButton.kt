@@ -34,7 +34,7 @@ fun ToolbarButton(
             )
             .size(45.dp),
         colors = IconButtonDefaults.filledTonalIconButtonColors(
-            containerColor = OffWhite,
+            containerColor = Color.White,
             contentColor = MaterialTheme.colorScheme.onSurface
         )
     ) {

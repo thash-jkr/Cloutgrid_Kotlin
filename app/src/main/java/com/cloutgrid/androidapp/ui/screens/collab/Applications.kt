@@ -35,6 +35,7 @@ import com.cloutgrid.androidapp.data.model.JobModel
 import com.cloutgrid.androidapp.data.network.ApiConfig
 import com.cloutgrid.androidapp.ui.components.CategoryList
 import com.cloutgrid.androidapp.ui.components.CloutHeader
+import com.cloutgrid.androidapp.ui.components.Empty
 import com.cloutgrid.androidapp.ui.theme.OffWhite
 
 @Composable
@@ -54,7 +55,7 @@ fun Applications(
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = OffWhite,
         topBar = {
             CloutHeader(
                 title = "Applications",
@@ -91,6 +92,14 @@ fun Applications(
                     )
                 }
 
+                if (applications.isEmpty()) {
+                    Empty(
+                        type = "collab",
+                        message = "No applications yet",
+                        isLoading = collab.isLoading
+                    )
+                }
+
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
                 ) {
@@ -108,7 +117,7 @@ fun Applications(
                                         .clip(CircleShape)
                                 )
                             },
-                            colors = ListItemDefaults.colors(containerColor = OffWhite),
+                            colors = ListItemDefaults.colors(containerColor = Color.White),
                             onClick = {
                                 if (job.questions.isEmpty()) {
                                     onNavigateToOtherProfile(application.creator.profile.username)

@@ -105,7 +105,9 @@ fun AppNavigation() {
         }
 
         composable<ChatScreen> {
-            ChatScreen()
+            ChatScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
 
         composable<TestRoute> {

@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -22,13 +20,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.cloutgrid.androidapp.data.model.HeaderAction
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.DpOffset
+import com.cloutgrid.androidapp.ui.theme.OffWhite
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -126,18 +125,18 @@ fun CloutHeader(
                     "Answers"
                 )) {
                     listOf(
-                        Color.White.copy(alpha = 1f),
-                        Color.White.copy(alpha = 0.8f),
-                        Color.White.copy(alpha = 0.0f)
+                        OffWhite.copy(alpha = 1f),
+                        OffWhite.copy(alpha = 0.8f),
+                        OffWhite.copy(alpha = 0.0f)
                     )
                 } else {
                     listOf(
-                        Color.White.copy(alpha = 0.5f),
-                        Color.White.copy(alpha = 0.4f),
-                        Color.White.copy(alpha = 0.3f),
-                        Color.White.copy(alpha = 0.2f),
-                        Color.White.copy(alpha = 0.1f),
-                        Color.White.copy(alpha = 0.0f)
+                        OffWhite.copy(alpha = 0.5f),
+                        OffWhite.copy(alpha = 0.4f),
+                        OffWhite.copy(alpha = 0.3f),
+                        OffWhite.copy(alpha = 0.2f),
+                        OffWhite.copy(alpha = 0.1f),
+                        OffWhite.copy(alpha = 0.0f)
                     )
                 }
             )

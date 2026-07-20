@@ -78,20 +78,23 @@ fun LoginScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
                 .padding(innerPadding),
             contentAlignment = Alignment.TopCenter
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(
+                        start = 15.dp,
+                        end = 15.dp,
+                    ),
+                verticalArrangement = Arrangement.spacedBy(15.dp)
             ) {
                 OutlinedTextField(
                     state = emailState,
                     label = { Text("Email") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(all=10.dp)
                 )
 
                 OutlinedSecureTextField(
@@ -99,7 +102,6 @@ fun LoginScreen(
                     label = { Text("Password") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(all=10.dp)
                 )
 
                 Row(
@@ -129,7 +131,11 @@ fun LoginScreen(
                     }
                 }
 
-                Column {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(15.dp),
+                ) {
                     LoginFooter(
                         question = "Don't have an account?",
                         answer = "Register",
@@ -174,7 +180,7 @@ fun LoginFooter(question: String, answer: String, onClick: () -> Unit) {
             fontSize = 14.sp,
             color = Color.Black,
             modifier = Modifier
-                .padding(top = 10.dp, end = 5.dp)
+                .padding(end = 5.dp)
         )
 
         Text(
@@ -182,8 +188,6 @@ fun LoginFooter(question: String, answer: String, onClick: () -> Unit) {
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
-            modifier = Modifier
-                .padding(top = 10.dp)
         )
     }
 }

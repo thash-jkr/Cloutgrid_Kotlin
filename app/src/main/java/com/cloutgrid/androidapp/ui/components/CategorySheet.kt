@@ -41,7 +41,7 @@ fun CategorySheet(
     onCategorySelected: (CategoryList) -> Unit,
 ) {
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = OffWhite,
         topBar = {
             CloutHeader(
                 title = "Choose Category",
@@ -50,7 +50,6 @@ fun CategorySheet(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .background(Color.White)
                 .fillMaxSize()
         ) {
             LazyColumn(
@@ -81,7 +80,7 @@ fun CategorySheet(
                             )
                         },
                         colors = ListItemDefaults.colors(
-                            containerColor = OffWhite,
+                            containerColor = Color.White,
                             selectedContainerColor = Second
                         ),
                         onClick = {

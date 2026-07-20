@@ -1,15 +1,18 @@
 package com.cloutgrid.androidapp.ui.screens.collab
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -44,6 +47,7 @@ fun CollabScreen(
 ) {
     var selectedJob by remember { mutableStateOf<JobModel?>(null) }
     val context = LocalContext.current
+    var isRefreshing by remember { mutableStateOf(false) }
 
     val type by collab.type.collectAsState()
 
@@ -76,25 +80,33 @@ fun CollabScreen(
         }
     ) { innerPadding ->
         PullToRefreshBox(
-            isRefreshing = collab.isLoading && collab.jobs.isNotEmpty(),
+            isRefreshing = isRefreshing,
             onRefresh = {
+                isRefreshing = true
+
                 if (type == "creator") {
                     collab.fetchJobs()
                 } else {
                     collab.fetchBusinessJobs()
                 }
+
+                isRefreshing = false
             },
             modifier = Modifier.fillMaxSize()
         ) {
             LazyColumn(
                 contentPadding = PaddingValues(
                     top = innerPadding.calculateTopPadding(),
-                    bottom = scaffoldPadding.calculateBottomPadding()
+                    bottom = scaffoldPadding.calculateBottomPadding(),
+                    start = 15.dp,
+                    end = 15.dp
                 ),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
             ) {
-                items(items=collab.jobs, key = {it.id}) { job ->
-                    ListItem(
+                itemsIndexed(items=collab.jobs, key = {_, it -> it.id}) { index, job ->
+                    SegmentedListItem(
+                        shapes = ListItemDefaults.segmentedShapes(index = index, count = collab.jobs.count()),
                         leadingContent = @Composable {
                             AsyncImage(
                                 model = if (type == "creator") job.postedBy.profile.profilePhoto
@@ -108,9 +120,14 @@ fun CollabScreen(
                         },
                         supportingContent = @Composable {
                             if (type == "creator") {
-                                Text(CategoryList.label(job.postedBy.targetAudience ?: ""))
+                                Text("Target category: ${CategoryList.label(job.targetCreator)}")
                             } else {
                                 Text("Posted: ${job.timeAgo}")
+                            }
+                        },
+                        overlineContent = {
+                            if (type == "creator") {
+                                Text(job.postedBy.profile.name)
                             }
                         },
                         onClick = { selectedJob = job },

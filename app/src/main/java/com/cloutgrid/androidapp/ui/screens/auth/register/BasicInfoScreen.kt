@@ -88,7 +88,6 @@ fun BasicInfoScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
                 .padding(innerPadding),
             contentAlignment = Alignment.TopCenter
         ) {

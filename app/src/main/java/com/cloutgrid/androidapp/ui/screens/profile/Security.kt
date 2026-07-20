@@ -7,9 +7,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.Help
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,7 +38,7 @@ fun Security(
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        containerColor = OffWhite,
         topBar = {
             CloutHeader(
                 title = "Security",
@@ -47,49 +50,48 @@ fun Security(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
-                .padding(paddingValues),
-            contentPadding = PaddingValues(vertical = 16.dp)
         ) {
-//            item {
-//                Card(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 16.dp),
-//                    shape = RoundedCornerShape(20.dp),
-//                    colors = CardDefaults.cardColors(
-//                        containerColor = OffWhite
-//                    )
-//                ) {
-//                    ListRow(
-//                        title = "Change password",
-//                        icon = Icons.Outlined.Lock,
-//                        onClick = { }
-//                    )
-//                }
-//            }
-
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = OffWhite
+            Column(
+                modifier = Modifier
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        start = 16.dp,
+                        end = 16.dp,
                     )
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
+            ) {
+                SegmentedListItem(
+                    shapes = ListItemDefaults.segmentedShapes(index = 0, count = 2),
+                    leadingContent = {
+                        Icon(
+                            Icons.Rounded.Lock,
+                            contentDescription = "Password",
+                        )
+                    },
+                    onClick = { },
+                    colors = ListItemDefaults.colors(containerColor = Color.White),
                 ) {
-                    ListRow(
-                        title = "Delete account",
-                        icon = Icons.Outlined.DeleteOutline,
-                        onClick = { showDeleteDialog = true },
-                        danger = true
-                    )
+                    Text("Change Password")
+                }
+
+                SegmentedListItem(
+                    shapes = ListItemDefaults.segmentedShapes(index = 1, count = 2),
+                    leadingContent = {
+                        Icon(
+                            Icons.Rounded.Delete,
+                            contentDescription = "Delete",
+                        )
+                    },
+                    onClick = {
+                        showDeleteDialog = true
+                    },
+                    colors = ListItemDefaults.colors(containerColor = Color.White),
+                ) {
+                    Text("Delete Account")
                 }
             }
         }

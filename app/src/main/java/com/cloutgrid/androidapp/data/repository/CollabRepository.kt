@@ -39,13 +39,14 @@ class CollabRepository @Inject constructor(
     }
 
     suspend fun fetchApplications(jobId: Int) {
+        applications.clear()
+
         val response: List<ApplicationModel> = apiService.request(
             endpoint = "/jobs/my-jobs/$jobId/",
             method = "GET",
             requireAuth = true
         )
 
-        applications.clear()
         applications.addAll(response)
     }
 

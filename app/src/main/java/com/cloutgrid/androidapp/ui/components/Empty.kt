@@ -16,6 +16,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.cloutgrid.androidapp.R
+import com.cloutgrid.androidapp.ui.theme.OffWhite
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -36,7 +37,7 @@ fun Empty(
 
     Column(
         modifier = modifier
-            .background(Color.White)
+            .background(OffWhite)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp)

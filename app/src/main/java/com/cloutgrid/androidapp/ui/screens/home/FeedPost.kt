@@ -64,6 +64,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import com.cloutgrid.androidapp.ui.components.ReportBox
 import com.cloutgrid.androidapp.ui.theme.First
+import com.cloutgrid.androidapp.ui.theme.OffWhite
 import kotlinx.coroutines.launch
 
 @Composable
@@ -110,7 +111,7 @@ fun FeedPost(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = OffWhite),
         shape = RectangleShape
     ) {
         Column {

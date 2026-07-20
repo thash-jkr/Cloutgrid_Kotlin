@@ -1,8 +1,10 @@
 package com.cloutgrid.androidapp.ui.screens.auth
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,12 +22,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cloutgrid.androidapp.ui.theme.First
-import com.cloutgrid.androidapp.ui.theme.OffWhite
 import com.cloutgrid.androidapp.ui.theme.Second
 
 @Composable
@@ -107,43 +109,53 @@ fun LandingScreen(
     }
 }
 
-
 @Composable
 fun HomeSelectionCard(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val homeCardLeft = Color(0xFF8F80FF)
+    val homeCardRight = Color(0xFFCEC1F8)
+
     Card(
         modifier = modifier
             .size(width = 300.dp, height = 200.dp)
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(
-            containerColor = OffWhite
-        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(homeCardLeft, homeCardRight)
+                    )
+                )
         ) {
-            Text(
-                text = text,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Black
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
 
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Navigate Forward",
-                tint = Color.Black,
-                modifier = Modifier.padding(top = 10.dp)
-            )
+                ) {
+                Text(
+                    text = text,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black
+                )
+
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Navigate Forward",
+                    tint = Color.Black,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            }
         }
     }
 }

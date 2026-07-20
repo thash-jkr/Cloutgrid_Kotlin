@@ -2,6 +2,7 @@ package com.cloutgrid.androidapp.data.network
 
 import android.util.Log
 import com.cloutgrid.androidapp.data.repository.AuthRepository
+import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.okhttp.*
@@ -38,6 +39,8 @@ class APIService @Inject constructor(
                 coerceInputValues = true
             })
         }
+
+        install(WebSockets)
 
         // AUTOMATIC REACTIVE TOKEN REFRESH ENGINE
         install(Auth) {

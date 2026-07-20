@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.cloutgrid.androidapp.ui.shared.AppCoordinator
 import com.cloutgrid.androidapp.ui.theme.CloutgridTheme
+import com.cloutgrid.androidapp.ui.theme.OffWhite
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -27,7 +28,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CloutgridTheme {
-                Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
+                Surface(modifier = Modifier.fillMaxSize(), color = OffWhite) {
                     AppCoordinator()
                 }
             }

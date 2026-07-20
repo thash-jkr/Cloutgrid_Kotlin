@@ -100,6 +100,7 @@ fun Questions(
                     top = innerPadding.calculateTopPadding(),
                     start = 16.dp,
                     end = 16.dp,
+                    bottom = 100.dp
                 ),
                 modifier = Modifier
                     .fillMaxSize()

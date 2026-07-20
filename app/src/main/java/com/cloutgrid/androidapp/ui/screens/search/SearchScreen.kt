@@ -61,6 +61,7 @@ fun SearchScreen(
     search: SearchManager = hiltViewModel()
 ) {
     var query by remember { mutableStateOf("") }
+    var isRefreshing by remember { mutableStateOf(false) }
 
     val userList = if (query.isEmpty()) search.suggestions else search.results
 
@@ -77,7 +78,7 @@ fun SearchScreen(
     }
 
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = OffWhite,
         topBar = {
             CloutHeader(
                 title = "Connect"
@@ -85,7 +86,7 @@ fun SearchScreen(
         }
     ) { innerPadding ->
         PullToRefreshBox(
-            isRefreshing = search.isLoading && search.suggestions.isNotEmpty(),
+            isRefreshing = isRefreshing,
             onRefresh = {
                 search.fetchSuggestions()
             },
@@ -123,8 +124,8 @@ fun SearchScreen(
                             shape = RoundedCornerShape(12.dp),
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color.White
+                                focusedContainerColor = OffWhite,
+                                unfocusedContainerColor = OffWhite
                             )
                         )
                     }
@@ -150,7 +151,7 @@ fun SearchScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(20.dp),
                                 colors = CardDefaults.elevatedCardColors(
-                                    containerColor = OffWhite
+                                    containerColor = Color.White
                                 ),
                                 elevation = CardDefaults.elevatedCardElevation()
                             ) {

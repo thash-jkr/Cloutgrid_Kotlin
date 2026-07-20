@@ -123,7 +123,7 @@ fun ProfileScreen(
             LazyColumn(
                 contentPadding = PaddingValues(
                     top = innerPadding.calculateTopPadding(),
-                    bottom = scaffoldPadding.calculateBottomPadding()
+                    bottom = innerPadding.calculateBottomPadding() + scaffoldPadding.calculateBottomPadding()
                 ),
                 modifier = Modifier.fillMaxSize()
             ) {

@@ -51,7 +51,7 @@ fun Comments(
     var reportContent by remember { mutableStateOf("") }
 
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = OffWhite,
         topBar = {
             CloutHeader(title = "Comments")
         }
@@ -66,7 +66,6 @@ fun Comments(
                 if (comments.isNotEmpty()) {
                     LazyColumn(
                         modifier = Modifier
-                            .background(Color.White)
                             .fillMaxSize(),
                         contentPadding = PaddingValues(
                             top = innerPadding.calculateTopPadding(),
@@ -89,7 +88,6 @@ fun Comments(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color.White)
                             .padding(top = innerPadding.calculateTopPadding())
                     ) {
                         Empty(
@@ -203,7 +201,7 @@ fun CommentRow(
                             .clip(CircleShape)
                     )
                 },
-                colors = ListItemDefaults.colors(containerColor = Color.White),
+                colors = ListItemDefaults.colors(containerColor = OffWhite),
                 overlineContent = {
                     Text("${comment.user.username} • ${comment.timeAgo}")
                 }
@@ -231,11 +229,11 @@ private fun CommentInputBar(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 2.dp,
+                elevation = 1.dp,
                 shape = CircleShape,
                 clip = true
             )
-            .background(OffWhite, shape = RoundedCornerShape(28.dp))
+            .background(Color.White, shape = RoundedCornerShape(28.dp))
             .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

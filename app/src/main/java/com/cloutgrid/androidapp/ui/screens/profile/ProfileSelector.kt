@@ -46,7 +46,7 @@ fun ProfileSelector(
                     shape = CircleShape,
                     clip = false
                 )
-                .background(color = OffWhite, shape = CircleShape)
+                .background(color = Color.White, shape = CircleShape)
                 .padding(horizontal = 6.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.spacedBy(25.dp),
             verticalAlignment = Alignment.CenterVertically

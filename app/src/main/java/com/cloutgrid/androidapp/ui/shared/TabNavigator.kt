@@ -73,10 +73,10 @@ fun TabNavigator(
             Surface(
                 modifier = Modifier
                     .navigationBarsPadding()
-                    .padding(vertical = 15.dp, horizontal = 15.dp)
+                    .padding(horizontal = 15.dp)
                     .height(70.dp),
                 shape = CircleShape,
-                color = OffWhite,
+                color = Color.White,
                 shadowElevation = 1.dp
             ) {
                 Row(

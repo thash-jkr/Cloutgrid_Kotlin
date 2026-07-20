@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.cloutgrid.androidapp.data.model.HeaderAction
 import com.cloutgrid.androidapp.ui.components.CloutHeader
+import com.cloutgrid.androidapp.ui.theme.OffWhite
 
 @Composable
 fun ResetPassword(
@@ -48,6 +49,7 @@ fun ResetPassword(
     }
 
     Scaffold(
+        contentColor = OffWhite,
         topBar = {
             CloutHeader(
                 title = "Reset Password",
@@ -61,7 +63,6 @@ fun ResetPassword(
     ) { innerPadding ->
         Box(
             modifier = Modifier
-                .background(Color.White)
                 .fillMaxSize( )
                 .padding(
                 innerPadding
